@@ -24,3 +24,16 @@ create policy "running_entries_update_own" on public.running_entries for update 
 create policy "running_entries_delete_own" on public.running_entries for delete to authenticated using ((select auth.uid())=user_id);
 grant select,insert,update,delete on public.running_entries to authenticated;
 create index if not exists running_entries_last_changed_idx on public.running_entries(user_id,updated_at desc);
+-- Recibir cambios INSERT/UPDATE en tiempo real para los usuarios autorizados.
+-- No elimina ni recrea la publicacion (puede incluir otras tablas).
+do $$
+begin
+ if exists (select 1 from pg_publication where pubname='supabase_realtime')
+    and not exists (
+      select 1 from pg_publication_tables
+      where pubname='supabase_realtime'
+        and schemaname='public' and tablename='running_entries'
+    ) then
+   alter publication supabase_realtime add table public.running_entries;
+ end if;
+end $$;
