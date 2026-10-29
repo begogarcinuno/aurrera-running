@@ -77,7 +77,9 @@ Aurrera Running incluye un panel Intervals.icu en Ajustes y nube y resúmenes en
 3. En Aurrera, abre Ajustes y nube → Intervals.icu, introduce la clave en el campo privado y pulsa Conectar.
 4. Revisa el progreso o registra una actividad en el plan.
 
-Seguridad: la clave se usa para las peticiones directas del navegador a la API y se mantiene solo en sessionStorage. Nunca debe incluirse en GitHub, en un chat, en enlaces, capturas ni archivos compartidos. Tendrás que conectarte por separado en cada navegador.
+Persistencia: por defecto, al conectar una clave personal se marca **Mantener conectada mi cuenta en este dispositivo**. La clave permanece en `localStorage` de ese navegador después de cerrarlo, y los entrenamientos se consultan automáticamente al volver a entrar. Si había una conexión activa en `sessionStorage` cuando se despliega esta versión, se migra al almacenamiento persistente para no tener que pegar de nuevo la clave. En Ajustes puedes seleccionar **Usar solo esta sesión**, **Recordar en este dispositivo** o **Desconectar y borrar clave**.
+
+**Seguridad:** esta opción guarda la clave sin cifrado adicional en el almacenamiento local del navegador, accesible a los scripts del sitio y a quien tenga acceso a ese perfil. Úsala solo en equipos propios; no la emplees en ordenadores compartidos. Puedes revocar o regenerar la clave desde Intervals.icu. La clave no está en GitHub, no se envía a Supabase ni se sincroniza con otros dispositivos. Si borras los datos del sitio, cambias de navegador o revocas la clave, tendrás que conectar de nuevo.
 
 ### Vía OAuth PKCE
 
@@ -92,7 +94,7 @@ La aplicación pide únicamente ACTIVITY:READ; no escribe datos en Intervals.icu
 
 ### Restricciones y limitaciones
 
-La API no proporciona todos los datos de actividades importadas únicamente desde Strava. Usa conexiones directas del reloj/dispositivo desde https://intervals.icu/settings/connections para tener acceso a las actividades permitidas. Los tokens se mantienen por sesión en el navegador y NO se sincronizan entre dispositivos. La sincronización de registros de Aurrera entre móvil y ordenador sigue requiriendo activar Supabase.
+La API no proporciona todos los datos de actividades importadas únicamente desde Strava. Usa conexiones directas del reloj/dispositivo desde https://intervals.icu/settings/connections para tener acceso a las actividades permitidas. Los tokens OAuth se mantienen por sesión; las claves personales pueden recordarse únicamente en el navegador donde se autorizan. La sincronización de registros de Aurrera entre móvil y ordenador sigue requiriendo activar Supabase.
 
 Fuentes oficiales:
 - https://forum.intervals.icu/t/api-access-to-intervals-icu/609
