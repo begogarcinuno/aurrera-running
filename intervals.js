@@ -7,11 +7,21 @@
   const API = ORIGIN + '/api/v1/athlete/0/activities';
   const C_ID = 'aurrera.intervals.client_id.v1';
   const C_KEY = 'aurrera.intervals.session.api_key.v1';
+  const C_SAVED_KEY = 'aurrera.intervals.remembered.api_key.v1';
+  const C_REMEMBER_PREF = 'aurrera.intervals.remember.preference.v1';
   const C_TOKEN = 'aurrera.intervals.session.oauth_token.v1';
   const C_FLOW = 'aurrera.intervals.pkce.flow.v1';
+  // Migrate an already-verified personal key from an open tab to permanent
+  // storage after the user requested to remember this connection.
+  const previousSessionKey = sessionStorage.getItem(C_KEY) || '';
+  const previouslyRemembered = localStorage.getItem(C_SAVED_KEY) || '';
+  const canMigrate = !!previousSessionKey && !previouslyRemembered &&
+    localStorage.getItem(C_REMEMBER_PREF) !== 'session-only' &&
+    !sessionStorage.getItem(C_TOKEN);
+  if (canMigrate) localStorage.setItem(C_SAVED_KEY, previousSessionKey);
   const icu = {
     clientId: localStorage.getItem(C_ID) || '',
-    key: sessionStorage.getItem(C_KEY) || '',
+    key: previousSessionKey || localStorage.getItem(C_SAVED_KEY) || '',
     token: sessionStorage.getItem(C_TOKEN) || '',
     runs: [], stravaStubs: 0, loading: false, lastSync: null, error: '', notice: '',
     loaded: false
@@ -19,7 +29,8 @@
   const escape = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const kmStr = n => Number(n).toLocaleString('es-ES', {maximumFractionDigits:1});
   const connected = () => !!(icu.token || icu.key);
-  const method = () => icu.token ? 'OAuth (PKCE)' : 'Clave personal (sesión)';
+  const isRemembered = () => !!icu.key && !icu.token && localStorage.getItem(C_SAVED_KEY) === icu.key;
+  const method = () => icu.token ? 'OAuth (PKCE) · sesión' : isRemembered() ? 'Clave personal · recordada' : 'Clave personal · sesión';
   const redirectUri = () => location.origin + location.pathname;
   const formatTime = sec => {
     const x = Math.max(0, Math.round(Number(sec) || 0));
@@ -91,7 +102,16 @@
     if (ok) {
       icu.key=key; icu.token='';
       sessionStorage.setItem(C_KEY,key);sessionStorage.removeItem(C_TOKEN);
-      icu.notice='Conexión verificada. La clave solo se conserva durante esta sesión del navegador.';
+      const remember = document.getElementById('icu-remember')?.checked !== false;
+      if (remember) {
+        localStorage.setItem(C_SAVED_KEY,key);
+        localStorage.removeItem(C_REMEMBER_PREF);
+        icu.notice='Conexión verificada. Recordaré tu cuenta en este dispositivo cuando vuelvas a abrir la web.';
+      } else {
+        localStorage.removeItem(C_SAVED_KEY);
+        localStorage.setItem(C_REMEMBER_PREF,'session-only');
+        icu.notice='Conexión verificada para esta sesión del navegador.';
+      }
       refreshView();
     }
   }
@@ -141,6 +161,7 @@
       const token=String(responseData.access_token);
       icu.token=token;icu.key='';icu.clientId=flow.clientId;
       sessionStorage.setItem(C_TOKEN,token);sessionStorage.removeItem(C_KEY);
+      localStorage.removeItem(C_SAVED_KEY);
       icu.notice='Autorización OAuth completada. Permiso concedido: ACTIVITY:READ.';
     }catch(e){sessionError(e);}
     finally{icu.loading=false;refreshView();}
@@ -153,9 +174,24 @@
     icu.notice=value?'Client ID guardado en este navegador. No es un dato secreto.':'Client ID eliminado.';
     icu.error='';refreshView();
   }
+  function rememberCurrentDevice() {
+    if (!icu.key || icu.token) return;
+    localStorage.setItem(C_SAVED_KEY,icu.key);
+    localStorage.removeItem(C_REMEMBER_PREF);
+    icu.notice='Este dispositivo recordará tu conexión al cerrar y volver a abrir el navegador.';
+    icu.error='';refreshView();
+  }
+  function useCurrentSessionOnly() {
+    localStorage.removeItem(C_SAVED_KEY);
+    localStorage.setItem(C_REMEMBER_PREF,'session-only');
+    icu.notice='La clave ya no quedará guardada. Seguirás conectada únicamente durante esta sesión.';
+    icu.error='';refreshView();
+  }
   function disconnect(){
-    icu.key='';icu.token='';icu.runs=[];icu.lastSync=null;icu.loaded=false;icu.error='';icu.notice='Desconectado en este navegador. Tus registros manuales no se han modificado.';
+    icu.key='';icu.token='';icu.runs=[];icu.lastSync=null;icu.loaded=false;icu.error='';icu.notice='Desconectado. He eliminado la clave guardada en este navegador sin cambiar tus entrenamientos.';
     sessionStorage.removeItem(C_TOKEN);sessionStorage.removeItem(C_KEY);
+    localStorage.removeItem(C_SAVED_KEY);
+    localStorage.removeItem(C_REMEMBER_PREF);
     refreshView();
   }
   function stats(){
@@ -188,14 +224,18 @@
     if(icu.notice)html+='<div class="icu-notice" role="status">'+escape(icu.notice)+'</div>';
     if(connected()){
       html+=metrics();
-      html+='<div class="icu-buttons"><button class="icu-btn" data-icu-action="sync" '+(icu.loading?'disabled':'')+'>'+(icu.loading?'Consultando…':'Actualizar mis entrenamientos')+'</button><button class="icu-btn ghost" data-icu-action="disconnect">Desconectar este navegador</button><a class="icu-inline-link" href="'+safeUrl+'" rel="noopener noreferrer" target="_blank">Mis conexiones en Intervals.icu ↗</a></div>';
+      html+='<div class="icu-buttons"><button class="icu-btn" data-icu-action="sync" '+(icu.loading?'disabled':'')+'>'+(icu.loading?'Consultando…':'Actualizar mis entrenamientos')+'</button>';
+      if(icu.key && !icu.token)html+='<button class="icu-btn secondary" data-icu-action="'+(isRemembered()?'session-only':'remember-device')+'">'+(isRemembered()?'Usar solo esta sesión':'Recordar en este dispositivo')+'</button>';
+      html+='<button class="icu-btn ghost" data-icu-action="disconnect">Desconectar y borrar clave</button><a class="icu-inline-link" href="'+safeUrl+'" rel="noopener noreferrer" target="_blank">Mis conexiones en Intervals.icu ↗</a></div>';
+      if(icu.key)html+='<div class="icu-notice">'+(isRemembered()?'<strong>Conexión recordada en este dispositivo.</strong> Puedes cerrar el navegador y volver a abrir Aurrera sin introducir de nuevo la clave.':'La clave se conserva solo durante la sesión actual.')+' <span>La clave personal se guarda sin cifrado adicional en el almacenamiento de este navegador, <strong>no en GitHub</strong>. Utiliza esta opción únicamente en dispositivos propios; cualquier persona o código con acceso a los datos del sitio podría utilizarla. No se comparte con otros dispositivos.</span></div>';
       if(icu.lastSync)html+='<p class="icu-footnote">Última consulta: '+escape(icu.lastSync.toLocaleString('es-ES'))+'. Solo lectura; no se envían entrenamientos a Intervals.icu.</p>';
       if(icu.stravaStubs)html+='<div class="icu-notice">Intervals.icu ha ocultado '+icu.stravaStubs+' actividad(es) importadas desde Strava por sus condiciones de API. Conecta tu dispositivo directamente en Intervals.icu para acceder a datos completos.</div>';
       html+='<div class="icu-section-name">Mis actividades de running</div>'+activityList(8);
     }else{
       html+='<div class="icu-section-name">Conectar ahora · clave personal</div>';
       html+='<div class="icu-form"><div><label for="icu-key">Clave API personal (solo en este navegador)</label><input type="password" id="icu-key" placeholder="Pega tu clave privada aquí, nunca en el chat ni en GitHub" autocomplete="off" spellcheck="false"></div><button class="icu-btn" data-icu-action="connect-key" '+(icu.loading?'disabled':'')+'>Conectar</button></div>';
-      html+='<p class="icu-help">Genera tu clave en <a class="icu-inline-link" target="_blank" rel="noopener noreferrer" href="https://intervals.icu/settings">Intervals.icu → Settings → Developer Settings</a>. Se guarda exclusivamente en la sesión de este navegador, no en el repositorio ni en la nube. Al cerrar la sesión del navegador puede ser necesario volver a introducirla.</p>';
+      html+='<label class="icu-checkbox" for="icu-remember"><input type="checkbox" id="icu-remember" checked><span><strong>Mantener conectada mi cuenta en este dispositivo</strong><small>Se guarda la clave en el almacenamiento del navegador hasta que te desconectes o borres los datos del sitio.</small></span></label>';
+      html+='<p class="icu-help">Genera tu clave en <a class="icu-inline-link" target="_blank" rel="noopener noreferrer" href="https://intervals.icu/settings">Intervals.icu → Settings → Developer Settings</a>. No se sube a GitHub ni a Supabase. Para mantener la sesión se almacena localmente sin cifrado adicional; hazlo solo en un dispositivo personal.</p>';
       html+='<div class="icu-division">O conexión con OAuth</div>';
       html+='<div class="icu-form"><div><label for="icu-client-id">Client ID de tu aplicación OAuth</label><input id="icu-client-id" placeholder="Client ID de una aplicación aprobada" autocomplete="off" spellcheck="false" value="'+escape(icu.clientId)+'"></div><button class="icu-btn secondary" data-icu-action="oauth" '+(icu.loading?'disabled':'')+'>Autorizar con Intervals.icu</button></div>';
       html+='<div class="icu-buttons"><button class="icu-btn ghost" data-icu-action="save-client-id">Guardar Client ID</button><a class="icu-inline-link" target="_blank" rel="noopener noreferrer" href="https://intervals.icu/oauth/apply">Solicitar aplicación OAuth ↗</a><a class="icu-inline-link" target="_blank" rel="noopener noreferrer" href="https://intervals.icu/settings/apps">Gestionar mis apps ↗</a></div>';
@@ -245,6 +285,8 @@
     if(action==='save-client-id'){saveClientId();return;}
     if(action==='oauth'){await startOAuth();return;}
     if(action==='sync'){if(connected())await loadRuns();return;}
+    if(action==='remember-device'){rememberCurrentDevice();return;}
+    if(action==='session-only'){useCurrentSessionOnly();return;}
     if(action==='disconnect'){disconnect();return;}
     if(action==='apply'){applyRun(el.dataset.icuId);return;}
   });
