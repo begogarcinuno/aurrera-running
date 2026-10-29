@@ -34,13 +34,23 @@ La aplicación está publicada en **https://aurrera-running.vercel.app/**. El pr
 3. Confirma tu correo si Supabase te lo solicita, vuelve a la web y pulsa **Iniciar sesión**.
 4. Deja marcada **Mantener mi sesión iniciada** para que el navegador recuerde tu acceso al cerrar y volver a abrir la página.
 5. Abre la **misma URL** en tu móvil y accede una vez con la misma cuenta, también marcando la casilla.
-6. Marca un entrenamiento como completado en el móvil y comprueba que aparece en el ordenador. La aplicación sincroniza automáticamente; también puedes pulsar **Ajustes y nube → Sincronizar ahora**.
+6. Marca un entrenamiento como completado en el móvil. **Sin pulsar ningún botón y sin recargar**, el ordenador abierto con la misma cuenta se actualiza mediante Supabase Realtime. Si se interrumpe el WebSocket, la web consulta Supabase automáticamente cada **15 segundos** mientras permanece visible y de nuevo al recuperar el foco.
 
 **Sesión recordada:** cuando está marcada, Aurrera guarda el token de sesión y renovación en el almacenamiento local de ese navegador, **sin guardar tu contraseña**. Supabase puede invalidar la sesión por cierre, revocación o cambio de credenciales, en cuyo caso deberás iniciar sesión otra vez. Cada dispositivo recuerda su propia sesión. Desmarca la casilla en dispositivos compartidos.
 
 **Solo esta sesión:** si desmarcas la casilla, Aurrera conserva los tokens en `sessionStorage` y normalmente solicitará las credenciales al iniciar una nueva sesión de navegador. Desde **Ajustes y nube** podrás cambiar la preferencia o cerrar la sesión en ese dispositivo.
 
 **Sin cuenta:** la pantalla inicial permite **Continuar sin iniciar sesión**, pero en ese caso los entrenamientos se guardan solo en el navegador actual y no se sincronizan con Supabase.
+
+### Actualización automática en tiempo real
+
+Aurrera escucha los cambios de `public.running_entries` mediante un WebSocket de Supabase Realtime filtrado por `user_id`. Los cambios disparan una consulta REST protegida por las políticas RLS existentes; ningún dispositivo descarga los registros de otras cuentas. La publicación `supabase_realtime` debe incluir la tabla (el archivo [supabase_setup.sql](./supabase_setup.sql) ya incorpora la configuración).
+
+**Respaldo:** hay una comprobación silenciosa cada 15 segundos cuando la web está visible y otra al volver al navegador o recuperar Internet. La conexión se recupera con reintentos automáticos y actualiza su JWT al renovar la sesión. Si dos dispositivos modifican un mismo entrenamiento casi simultáneamente, se conserva la versión con la marca `updated_at` más reciente.
+
+**Edición sin interrupciones:** al consultar Supabase, la app no repinta toda la pantalla si no se han recibido cambios nuevos. Tampoco interrumpe la escritura en un campo activo. En **Ajustes y nube**, junto a tu usuario, se indica si la actualización está **En directo** o en el modo de comprobación automática.
+
+Para usar la actualización en tiempo real, los dos dispositivos deben tener Internet y haber iniciado sesión con la misma cuenta. Los navegadores pueden suspender las webs en segundo plano; al volver a la pantalla, la aplicación se pone al día automáticamente.
 
 ### Cómo funciona
 
