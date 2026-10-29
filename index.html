@@ -11,6 +11,7 @@
  <link rel="icon" href="./icon.svg" type="image/svg+xml">
  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
  <link rel="manifest" href="./manifest.webmanifest">
+ <link rel="stylesheet" href="./intervals.css">
  <title>Aurrera · Mi plan de running</title>
  <style>
 :root{
@@ -621,5 +622,6 @@ if(state.session&&configReady())syncCloud();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
 </script>
+<script src="./intervals.js" defer></script>
 </body>
 </html>
