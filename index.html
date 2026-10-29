@@ -647,8 +647,41 @@ let runningSync=false, queuedSync=false,syncTimer=null;
 function scheduleSync(){if(!state.session?.user?.id||!configReady())return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncCloud(),850);}
 function setSync(kind,error=''){state.syncState=kind;state.syncError=error;updateSync();}
 async function authCall(path,data){if(!configReady())throw new Error('Faltan la URL y la clave pública de Supabase.');const res=await fetch(`${state.config.url}/auth/v1/${path}`,{method:'POST',headers:{'apikey':state.config.key,'Content-Type':'application/json'},body:JSON.stringify(data)});let body={};try{body=await res.json();}catch{}if(!res.ok)throw new Error(body.error_description||body.msg||body.message||`Error de autenticación (${res.status})`);return body;}
-function persistSession(sess){state.session=sess;localStorage.setItem(SESSION_KEY,JSON.stringify(sess));}
-async function refreshSession(){if(!state.session?.refresh_token)throw new Error('La sesión caducó; vuelve a iniciar sesión.');const oldUser=state.session.user;const result=await authCall('token?grant_type=refresh_token',{refresh_token:state.session.refresh_token});const session={access_token:result.access_token,refresh_token:result.refresh_token,expires_at:Date.now()+(result.expires_in||3600)*1000,user:result.user||oldUser};persistSession(session);}
+function persistSession(sess,remember=state.rememberSession){
+ state.session=sess;
+ state.rememberSession=!!remember;
+ const store=state.rememberSession?localStorage:sessionStorage;
+ const other=state.rememberSession?sessionStorage:localStorage;
+ store.setItem(SESSION_KEY,JSON.stringify(sess));
+ other.removeItem(SESSION_KEY);
+}
+function clearStoredSession(){
+ localStorage.removeItem(SESSION_KEY);
+ sessionStorage.removeItem(SESSION_KEY);
+ state.session=null;
+}
+async function refreshSession(){
+ if(!state.session?.refresh_token)throw new Error('La sesión caducó; vuelve a iniciar sesión.');
+ const oldUser=state.session.user;
+ let result;
+ try{
+   result=await authCall('token?grant_type=refresh_token',{refresh_token:state.session.refresh_token});
+ }catch(err){
+   const msg=String(err?.message||'');
+   if(/invalid.*refresh|refresh.*(not found|expired|invalid|revoked)|session.*(expired|revoked|not found)|invalid_grant/i.test(msg)){
+     clearStoredSession();
+     state.entries=loadEntries(GUEST_KEY);
+     state.entryDismissed=false;
+     state.entryMode='login';
+     state.entryFeedback={type:'error',text:'La sesión ha caducado o se ha revocado. Inicia sesión de nuevo para continuar.'};
+     renderShell();
+   }
+   throw err;
+ }
+ if(!result.access_token||!result.refresh_token)throw new Error('No se ha recibido una sesión renovada.');
+ const session={access_token:result.access_token,refresh_token:result.refresh_token,expires_at:Date.now()+(result.expires_in||3600)*1000,user:result.user||oldUser};
+ persistSession(session);
+}
 async function ensureSession(){if(!state.session?.access_token)throw new Error('Inicia sesión para sincronizar.');if(state.session.expires_at&&Date.now()>state.session.expires_at-120000)await refreshSession();}
 async function api(tablePath,method='GET',payload,refreshAllowed=true){await ensureSession();const headers={'apikey':state.config.key,'Authorization':`Bearer ${state.session.access_token}`,'Content-Type':'application/json'};if(method==='POST')headers.Prefer='resolution=merge-duplicates,return=minimal';const options={method,headers};if(payload!==undefined)options.body=JSON.stringify(payload);let res=await fetch(`${state.config.url}/rest/v1/${tablePath}`,options);if(res.status===401&&refreshAllowed){await refreshSession();return api(tablePath,method,payload,false);}if(!res.ok){let json={};try{json=await res.json();}catch{}throw new Error(json.message||json.error||`Error de sincronización ${res.status}. Revisa tabla y políticas RLS.`);}if(res.status===204||method==='POST')return null;return res.json();}
 function latestMerge(remote,local){let combined={...remote};for(let [date,e] of Object.entries(local)){if(!DAY_MAP[date]||!e||typeof e!=='object')continue;const t1=Date.parse(e.updated_at||'1970-01-01');const t2=Date.parse(combined[date]?.updated_at||'1970-01-01');if(!combined[date]||t1>=t2)combined[date]=e;}return combined;}
@@ -656,16 +689,113 @@ async function syncCloud(){if(!state.session?.user?.id||!configReady())return;if
 let local=latestMerge(loadEntries(entryKey()),state.entries);let merged=latestMerge(remote,local);const upload=Object.entries(merged).filter(([date,e])=>{const other=remote[date];return !other||Date.parse(e.updated_at||'1970-01-01')>Date.parse(other.updated_at||'1970-01-01');}).map(([day_key,e])=>({user_id:uid,day_key,status:e.status||'pending',actual_km:e.actual_km===undefined||e.actual_km===''?null:e.actual_km,rpe:e.rpe===undefined||e.rpe===''?null:e.rpe,note:String(e.note||'').slice(0,1200),result_time:String(e.result_time||'').slice(0,12),updated_at:e.updated_at||new Date().toISOString()}));
 if(upload.length){await api('running_entries?on_conflict=user_id,day_key','POST',upload);}state.entries=latestMerge(merged,loadEntries(entryKey()));persistEntries();state.lastSync=new Date().toISOString();setSync('synced');if(state.tab!=='settings'&&!state.modalDate)render();if(state.tab==='settings')render();
 }catch(err){setSync('error',err.message||'Error no identificado');if(state.tab==='settings')render();console.warn('Sincronización no disponible:',err);}finally{runningSync=false;if(queuedSync){queuedSync=false;setTimeout(syncCloud,1100);}}}
-async function runAuth(mode){const email=document.getElementById('auth-email')?.value.trim();const password=document.getElementById('auth-password')?.value||'';if(!email||!email.includes('@')||password.length<8){notify('Introduce un correo válido y una contraseña de 8 o más caracteres.');return;}
-const button=document.querySelector(`[data-action="${mode}"]`);if(button)button.disabled=true;
-try{const body=await authCall(mode==='signup'?'signup':'token?grant_type=password',{email,password});if(!body.access_token){notify('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');return;}let s={access_token:body.access_token,refresh_token:body.refresh_token,expires_at:Date.now()+(body.expires_in||3600)*1000,user:body.user};if(!s.user?.id)throw new Error('No se ha recibido un usuario válido.');const guest=loadEntries(GUEST_KEY);persistSession(s);state.entries=latestMerge(loadEntries(entryKey()),guest);persistEntries();if(Object.keys(guest).length)localStorage.removeItem(GUEST_KEY);notify('Sesión iniciada. Sincronizando tus entrenos…');render();await syncCloud();}
-catch(e){notify(`No se ha podido entrar: ${e.message||e}`);}finally{if(button)button.disabled=false;}}
-function logout(){localStorage.removeItem(SESSION_KEY);state.session=null;state.entries=loadEntries(GUEST_KEY);state.syncState='local';state.lastSync=null;notify('Sesión cerrada. Los datos de la nube permanecen en tu cuenta.');render();}
+
+function authFeedback(message,type='error'){
+ if(!state.session&&!state.entryDismissed){
+   state.entryFeedback={type,text:String(message)};
+   state.entryBusy=false;
+   renderShell();
+ }else notify(message);
+}
+async function runAuth(mode){
+ if(state.entryBusy)return;
+ const email=document.getElementById('auth-email')?.value.trim()||'';
+ const password=document.getElementById('auth-password')?.value||'';
+ const remember=document.getElementById('auth-remember')?.checked!==false;
+ const gateway=!state.session&&!state.entryDismissed;
+ state.entryEmail=email;
+ state.rememberSession=remember;
+ if(!email||!email.includes('@')||password.length<8){
+   authFeedback('Introduce un correo válido y una contraseña de 8 caracteres como mínimo.');
+   return;
+ }
+ const button=gateway?document.getElementById('auth-entry-submit'):document.querySelector('[data-action="'+mode+'"]');
+ if(button)button.disabled=true;
+ state.entryBusy=true;
+ try{
+   const body=await authCall(mode==='signup'?'signup':'token?grant_type=password',{email,password});
+   if(!body.access_token){
+     state.entryMode='login';
+     authFeedback('Cuenta creada. Si recibes un correo de Supabase, confírmalo y después inicia sesión.','success');
+     return;
+   }
+   const session={access_token:body.access_token,refresh_token:body.refresh_token,expires_at:Date.now()+(body.expires_in||3600)*1000,user:body.user};
+   if(!session.user?.id||!session.refresh_token)throw new Error('No se ha recibido una sesión válida.');
+   const guest=loadEntries(GUEST_KEY);
+   persistSession(session,remember);
+   state.entries=latestMerge(loadEntries(entryKey()),guest);
+   persistEntries();
+   if(Object.keys(guest).length)localStorage.removeItem(GUEST_KEY);
+   state.entryFeedback=null;
+   state.entryMode='login';
+   state.entryBusy=false;
+   renderShell();
+   notify('¡Sesión iniciada! Sincronizando tus entrenamientos…');
+   await syncCloud();
+ }catch(err){
+   authFeedback('No se ha podido acceder: '+String(err?.message||err));
+ }finally{
+   state.entryBusy=false;
+   if(button&&button.isConnected)button.disabled=false;
+ }
+}
+async function logout(){
+ const token=state.session?.access_token;
+ const url=state.config.url,key=state.config.key;
+ clearStoredSession();
+ state.entries=loadEntries(GUEST_KEY);
+ state.syncState='local';
+ state.syncError='';
+ state.lastSync=null;
+ state.entryDismissed=false;
+ state.entryMode='login';
+ state.entryEmail='';
+ state.entryFeedback={type:'success',text:'Has cerrado sesión en este dispositivo. Tus entrenamientos siguen guardados en tu cuenta.'};
+ state.rememberSession=true;
+ renderShell();
+ if(token&&configReady()){
+   try{
+     await fetch(url+'/auth/v1/logout?scope=local',{
+       method:'POST',
+       headers:{'apikey':key,'Authorization':'Bearer '+token}
+     });
+   }catch(err){
+     // The browser has already discarded the session even when offline.
+   }
+ }
+}
 function exportEntries(){let result={app:'Aurrera Running',version:PLAN.version,exportedAt:new Date().toISOString(),entries:state.entries};const blob=new Blob([JSON.stringify(result,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`mi-diario-running-${nowDate()}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('Diario exportado como JSON.');}
 async function importEntries(file){try{if(file.size>2_000_000)throw new Error('Archivo demasiado grande.');const txt=await file.text();const obj=JSON.parse(txt);if(!obj||typeof obj.entries!=='object'||Array.isArray(obj.entries))throw new Error('No es una copia de seguridad válida.');const incoming={};for(const [date,e] of Object.entries(obj.entries)){if(DAY_MAP[date]&&e&&typeof e==='object'){incoming[date]={status:['pending','done','skipped'].includes(e.status)?e.status:'pending',actual_km:e.actual_km??null,rpe:e.rpe??null,note:String(e.note||'').slice(0,1200),result_time:String(e.result_time||'').slice(0,12),updated_at:e.updated_at||new Date().toISOString()};}}state.entries=latestMerge(state.entries,incoming);persistEntries();scheduleSync();render();notify(`Se han importado ${Object.keys(incoming).length} registros.`);}catch(e){notify(`No se pudo importar: ${e.message}`);}}
 function moveMonth(step){let[y,m]=state.month.split('-').map(Number);let d=new Date(Date.UTC(y,m-1+step,1,12));let n=d.toISOString().slice(0,7);if(n>='2026-10'&&n<='2027-02'){state.month=n;let first=PLAN.days.find(x=>x.date.startsWith(n));if(first)state.selectedDate=first.date;render();}}
 function selectCalendarDay(date){state.selectedDate=date;state.calWeekIndex=weekIndexForDate(date);state.month=date.slice(0,7);render();if(window.matchMedia('(max-width:830px)').matches)openModal(date);}
+document.addEventListener('submit',async e=>{
+ if(e.target.id!=='auth-entry-form')return;
+ e.preventDefault();
+ await runAuth(state.entryMode==='signup'?'signup':'login');
+});
 document.addEventListener('click',async e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const act=btn.dataset.action;
+if(act==='auth-toggle'){
+ state.entryEmail=document.getElementById('auth-email')?.value.trim()||state.entryEmail;
+ state.rememberSession=document.getElementById('auth-remember')?.checked!==false;
+ state.entryMode=state.entryMode==='login'?'signup':'login';
+ state.entryFeedback=null;
+ renderShell();
+ return;
+}
+if(act==='auth-guest'){
+ state.entryDismissed=true;
+ state.entryFeedback=null;
+ renderShell();
+ return;
+}
+if(act==='auth-remember-toggle'){
+ if(state.session){
+   persistSession(state.session,!state.rememberSession);
+   render();
+   notify(state.rememberSession?'Tu sesión permanecerá iniciada en este dispositivo.':'Esta sesión solo durará mientras mantengas abierta la sesión del navegador.');
+ }
+ return;
+}
 if(act==='nav'){switchTab(btn.dataset.tab);return;}
 if(act==='home-week'){focusWeek(state.weekIndex+Number(btn.dataset.step));render();return;}
 if(act==='calendar-week'){focusWeek(state.calWeekIndex+Number(btn.dataset.step));render();return;}
@@ -683,7 +813,7 @@ if(act==='today'){state.selectedDate=DAY_MAP[nowDate()]?nowDate():PLAN.start;con
 if(act==='change-month'){moveMonth(Number(btn.dataset.step));return;}
 if(act==='save-config'){saveConfig();return;}
 if(act==='login'||act==='signup'){await runAuth(act);return;}
-if(act==='logout'){logout();return;}
+if(act==='logout'){await logout();return;}
 if(act==='sync-now'){await syncCloud();notify(state.syncState==='synced'?'Sincronización completada.':'No se pudo sincronizar. Revisa la configuración.');return;}
 if(act==='export'){exportEntries();return;}
 if(act==='import'){document.getElementById('import-file')?.click();return;}
