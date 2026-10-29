@@ -23,37 +23,41 @@ La web principal se publica en **Vercel**: https://aurrera-running.vercel.app/. 
 
 > **Importante:** la URL anterior es solo un ejemplo, no un enlace ya publicado. No es necesario crear un archivo llamado `CNAME` para usar el dominio normal de GitHub Pages.
 
-La web utiliza rutas relativa## 3. Sincronizar entrenamientos entre móvil y ordenador con Supabase
+La web utiliza rutas relativa## 3. Iniciar sesión y sincronizar entre el móvil y el ordenador
 
-La web está publicada, pero guardar una marca en el navegador de tu teléfono no la copia al ordenador hasta que configures la base de datos. El código de sincronización ya está incluido: no es necesario instalar dependencias ni convertir el HTML en una aplicación diferente.
+La aplicación está publicada en **https://aurrera-running.vercel.app/**. El proyecto de Supabase ya está configurado en la versión oficial y la tabla `public.running_entries` dispone de **RLS**: cada cuenta autenticada accede únicamente a sus propias sesiones de entrenamiento.
 
-### Preparar el proyecto una sola vez
+### Primer acceso
 
-1. Accede a https://supabase.com/dashboard . Si ya tienes un proyecto para Aurrera, reutilízalo; de lo contrario, crea uno nuevo (por ejemplo `aurrera-running`). Utiliza una contraseña de base de datos robusta y guárdala en tu gestor de contraseñas. Esa contraseña **no** es la clave pública ni se introduce en Aurrera.
-2. En el proyecto, abre **SQL Editor → New query** y pega íntegro el archivo [supabase_setup.sql](./supabase_setup.sql). Ejecuta **Run**. Se crea `public.running_entries` con seguridad Row Level Security (RLS): las cuentas autenticadas solo pueden consultar/modificar sus propios entrenamientos. No se concede acceso a los visitantes anónimos.
-3. En el panel de Supabase abre **Connect** (o **Project Settings → API Keys**) y busca **Project URL** y **Publishable key** (`sb_publishable_...`). Copia solo esos dos datos públicos. Nunca copies la base de datos, un secreto `sb_secret_...` ni la `service_role` a una página web o repositorio.
-4. En **Authentication → URL Configuration**, configura **Site URL** como `https://aurrera-running.vercel.app/`. Si mantienes también la web de GitHub Pages, puedes añadir `https://begogarcinuno.github.io/aurrera-running/` a **Redirect URLs**. Conserva activa la confirmación del correo electrónico.
-5. Abre la web https://aurrera-running.vercel.app/ → **Ajustes y nube**. Pega la URL del proyecto y la clave **pública** y pulsa **Guardar conexión**. En el apartado **Tu cuenta personal**, regístrate con un correo y una contraseña nuevos para Aurrera. Confirma el correo si Supabase lo solicita; después inicia sesión.
-6. Repite la configuración de URL y clave pública en el móvil o el ordenador que falte, entra con el **mismo correo y contraseña** y pulsa **Sincronizar ahora**. Cuando los datos estén sincronizados, las marcas se reflejarán en los dos.
+1. Abre https://aurrera-running.vercel.app/ en el ordenador.
+2. Aparecerá una **pantalla de inicio de sesión**. Si todavía no tienes una cuenta, pulsa **Crear cuenta** e introduce tu correo y una contraseña segura.
+3. Confirma tu correo si Supabase te lo solicita, vuelve a la web y pulsa **Iniciar sesión**.
+4. Deja marcada **Mantener mi sesión iniciada** para que el navegador recuerde tu acceso al cerrar y volver a abrir la página.
+5. Abre la **misma URL** en tu móvil y accede una vez con la misma cuenta, también marcando la casilla.
+6. Marca un entrenamiento como completado en el móvil y comprueba que aparece en el ordenador. La aplicación sincroniza automáticamente; también puedes pulsar **Ajustes y nube → Sincronizar ahora**.
 
-**Importante:** la URL y clave pública se guardan por navegador. Si quieres evitar pegarlas dos veces, se pueden publicar como constantes en `index.html` porque **son públicas**, pero solo después de comprobar la seguridad RLS. Vercel no inyecta automáticamente variables de entorno en este HTML estático; guardar una variable en Vercel sin adaptar el código no funcionará.
+**Sesión recordada:** cuando está marcada, Aurrera guarda el token de sesión y renovación en el almacenamiento local de ese navegador, **sin guardar tu contraseña**. Supabase puede invalidar la sesión por cierre, revocación o cambio de credenciales, en cuyo caso deberás iniciar sesión otra vez. Cada dispositivo recuerda su propia sesión. Desmarca la casilla en dispositivos compartidos.
 
-**Correos de confirmación:** el servidor SMTP gratuito de prueba de Supabase puede enviar solo a direcciones de los miembros del equipo del proyecto y tiene límites estrictos. Para una primera cuenta personal, utiliza el correo con el que creaste el proyecto; si necesitas otras direcciones, configura un proveedor SMTP. No desactives la verificación de correos solo para eludir ese límite.
+**Solo esta sesión:** si desmarcas la casilla, Aurrera conserva los tokens en `sessionStorage` y normalmente solicitará las credenciales al iniciar una nueva sesión de navegador. Desde **Ajustes y nube** podrás cambiar la preferencia o cerrar la sesión en ese dispositivo.
 
-### Comprobación de que funciona
+**Sin cuenta:** la pantalla inicial permite **Continuar sin iniciar sesión**, pero en ese caso los entrenamientos se guardan solo en el navegador actual y no se sincronizan con Supabase.
 
-1. En el móvil, abre **Mi calendario** y marca una sesión como **Completada**.
-2. Espera a que aparezca el indicador de sincronización completada o pulsa **Sincronizar ahora**.
-3. En el ordenador, abre **exactamente** `https://aurrera-running.vercel.app/` con la misma cuenta de Aurrera y pulsa **Sincronizar ahora**.
-4. Comprueba que el mismo entrenamiento aparece completado en el ordenador.
+### Cómo funciona
 
-### Si ya tenías entrenamientos guardados en GitHub Pages
+- **Vercel** sirve la web estática.
+- **GitHub** contiene el código fuente del calendario.
+- **Supabase** guarda las marcas y el histórico por usuario. Se utiliza la clave `sb_publishable_...` (pública) en el navegador, protegida con políticas RLS; **nunca** una clave `sb_secret_...` o `service_role`.
+- **Intervals.icu** proporciona las actividades registradas por el reloj cuando están disponibles y se conecta de forma independiente.
 
-Los registros locales de GitHub Pages y los de Vercel viven en orígenes distintos del navegador; no se copian automáticamente. En la web antigua, abre **Ajustes y nube → Exportar diario**. En la web de Vercel, utiliza **Importar diario** y después **Sincronizar ahora**. Conserva el archivo JSON como copia de seguridad. **Intervals.icu** y **Supabase** tienen funciones diferentes: Intervals.icu consulta actividad registrada por dispositivos; Supabase sincroniza el calendario propio de Aurrera.
+Si necesitas recrear la tabla en un proyecto nuevo, ejecuta el archivo [supabase_setup.sql](./supabase_setup.sql) desde Supabase SQL Editor. Al usar otro proyecto, configura únicamente la URL HTTPS del proyecto y su clave publicable.
 
-Documentación oficial: [Supabase: claves públicas](https://supabase.com/docs/guides/getting-started/api-keys), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security) y [URLs de autenticación](https://supabase.com/docs/guides/auth/redirect-urls).
+### Si ya tenías entrenamientos guardados en otra dirección
 
-e` están diseñadas para uso desde el navegador cuando las políticas RLS están bien configuradas.
+Las marcas locales de GitHub Pages y Vercel se guardan en orígenes distintos y no se copian automáticamente. Abre la web anterior y utiliza **Ajustes y nube → Exportar diario**. En la nueva web de Vercel, inicia sesión y utiliza **Importar diario** y después **Sincronizar ahora**. Conserva el archivo JSON como copia de seguridad.
+
+**Correos de confirmación:** Supabase puede limitar el correo SMTP de prueba a direcciones del equipo del proyecto. Si no recibes el correo de registro, revisa la configuración de Auth/SMTP antes de repetir el registro.
+
+Documentación: [API keys](https://supabase.com/docs/guides/getting-started/api-keys), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security) y [sesiones](https://supabase.com/docs/guides/auth/sessions).
 
 ## 4. Añadir al inicio del iPhone
 
