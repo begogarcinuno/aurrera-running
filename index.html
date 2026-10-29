@@ -395,7 +395,7 @@ function renderEntryGate(){
       '<form id="auth-entry-form">'+
         '<label class="auth-field" for="auth-email"><span>Correo electrónico</span><input id="auth-email" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="tu@email.com" value="'+esc(state.entryEmail||'')+'"></label>'+
         '<label class="auth-field" for="auth-password"><span>Contraseña</span><input id="auth-password" name="password" type="password" autocomplete="'+(signup?'new-password':'current-password')+'" minlength="8" required placeholder="Mínimo 8 caracteres"></label>'+
-        '<label class="auth-remember" for="auth-remember"><input id="auth-remember" type="checkbox" '+(state.rememberSession?'checked':'')+'><span><strong>Mantener mi sesión iniciada</strong><small>No tendrás que iniciar sesión cada vez que abras Aurrera en este dispositivo.</small></span></label>'+
+        '<label class="auth-remember" for="auth-remember"><input id="auth-remember" type="checkbox" '+(state.rememberSession?'checked':'')+'><span><strong>Mantener mi sesión iniciada</strong><small>No tendrás que iniciar sesión cada vez que abras Aurrera. Utiliza esta opción solo en dispositivos personales.</small></span></label>'+
         '<button class="auth-submit" type="submit" id="auth-entry-submit" '+(state.entryBusy?'disabled':'')+'>'+ico(signup?'user':'login','sm')+(signup?' Crear cuenta':' Iniciar sesión')+'</button>'+
       '</form>'+
       '<p class="auth-switch">'+(signup?'¿Ya tienes una cuenta?':'¿Es tu primera vez aquí?')+' <button type="button" class="auth-link" data-action="auth-toggle">'+(signup?'Iniciar sesión':'Crear cuenta')+'</button></p>'+
