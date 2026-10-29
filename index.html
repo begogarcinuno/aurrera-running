@@ -422,7 +422,7 @@ function renderShell(){if(!state.session&&!state.entryDismissed){document.getEle
 }
 function navButton(tab,icon,label,mobile=false){return `<button class="${mobile?'mob-nav-btn':'nav-btn'}${state.tab===tab?' active':''}" data-action="nav" data-tab="${tab}" aria-label="${label}" ${state.tab===tab?'aria-current="page"':''}>${ico(icon)}<span class="${mobile?'':'nav-text'}">${label}</span></button>`;}
 function updateNav(){document.querySelectorAll('[data-action="nav"]').forEach(el=>{if(!el.classList.contains('nav-btn')&&!el.classList.contains('mob-nav-btn'))return;const a=el.dataset.tab===state.tab;el.classList.toggle('active',a);if(a)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});const names={home:'INICIO',calendar:'MI CALENDARIO',races:'MIS CARRERAS',progress:'MI PROGRESO',settings:'AJUSTES'};const b=document.getElementById('breadcrumb');if(b)b.textContent=names[state.tab];}
-function updateSync(){const label=state.syncState==='synced'?'Sincronizado':state.syncState==='syncing'?'Sincronizando…':state.syncState==='error'?'Error de sincronización':state.session?.user?.id?'Nube sin conexión':'Modo local';const top=document.getElementById('top-sync');if(top){top.className='sync-pill '+syncClass();top.querySelector('span:nth-child(2)').textContent=label;}const mob=document.getElementById('mob-sync');if(mob){mob.className='mob-sync '+syncClass();mob.querySelector('span:nth-child(2)').textContent=state.session?.user?'Nube':'Local';}const foot=document.getElementById('foot-label');if(foot)foot.textContent=label;const dot=document.getElementById('foot-dot');if(dot)dot.className='dot '+(state.syncState==='synced'?'online':'');}
+function updateSync(){const label=state.syncState==='synced'?'Sincronizado':state.syncState==='syncing'?'Sincronizando…':state.syncState==='error'?'Error de sincronización':state.session?.user?.id?'Nube sin conexión':'Modo local';const top=document.getElementById('top-sync');if(top){top.className='sync-pill '+syncClass();top.querySelector('span:nth-child(2)').textContent=label;}const mob=document.getElementById('mob-sync');if(mob){mob.className='mob-sync '+syncClass();mob.querySelector('span:nth-child(2)').textContent=state.session?.user?'Nube':'Local';}const foot=document.getElementById('foot-label');if(foot)foot.textContent=label;const dot=document.getElementById('foot-dot');if(dot)dot.className='dot '+(state.syncState==='synced'?'online':'');window.AurreraAutoSync?.updateIndicator();}
 function render(){const target=document.getElementById('page-content');if(!target)return;target.innerHTML=state.tab==='home'?renderDashboard():state.tab==='calendar'?renderCalendar():state.tab==='races'?renderRaces():state.tab==='progress'?renderProgress():renderSettings();const side=document.getElementById('side-challenge');const total=aggregate();if(side)side.innerHTML=`<div class="side-challenge"><div class="micro">OBJETIVO PRINCIPAL</div><div class="sc-title">Donosti 10K<br>50–55 min</div><p>Un día cada vez. La constancia suma.</p><div class="mini-progress"><span style="width:${total.percent}%"></span></div><div style="color:#b5c4d4;font-size:10px">${total.completed} de ${total.planned} sesiones</div></div>`;updateNav();updateSync();}
 function hero(){const race=activeRace();const days=Math.max(0,utcDiffDays(race.date,nowDate()));return `<section class="hero"><div class="hero-copy"><span class="hero-tag">${ico('spark','sm')} TU SIGUIENTE RETO</span><h2>${race.name}</h2><p>${race.subtitle} · ${ucfirst(dformat(race.date,{day:'numeric',month:'long',year:'numeric'}))}. El objetivo es disfrutar y llegar preparada, paso a paso.</p><button class="hero-btn" data-action="nav" data-tab="races">Ver mis objetivos ${ico('arrow','sm')}</button></div><div class="hero-art"><div class="hero-ring"><div class="hero-ring-inner"><div class="number">${days}</div><div class="number-label">DÍAS</div></div></div></div></section>`;}
 function renderDashboard(){const a=aggregate();const week=WEEKS[state.weekIndex];const weekC=weekCompletion(week);const selected=DAY_MAP[state.selectedDate]||activeTrainingDay();const weekToday=DAY_MAP[nowDate()]||selected;return `
@@ -624,7 +624,7 @@ function renderProgress(){const a=aggregate();const history=PLAN.days.filter(d=>
 <section class="surface">${getBlockHeader('Semana a semana','Plan detallado de kilómetros')}<div class="mile-list">${WEEKS.map((w,i)=>{let km=weekDays(w).filter(Boolean).reduce((sum,d)=>sum+doneKm(d),0);return `<div class="mile-item"><span class="wname">S${i+1} · ${dformat(w.start,{day:'numeric',month:'short'})}</span><span class="wtrack"><span style="width:${Math.min(100,w.planKm?Math.round(km/w.planKm*100):0)}%"></span></span><span class="wkm">${fmtKm(km)}/${fmtKm(w.planKm)}</span></div>`;}).join('')}</div><p class="muted-small" style="margin:19px 0 0">Los kilómetros son estimaciones, no obligaciones. Si bajas carga por dolor o cansancio, prioriza tu salud.</p></section></div>`;}
 function renderSettings(){const ready=configReady();const user=state.session?.user;return `<div class="page-title"><div><div class="eyebrow">TU CUENTA Y TUS DATOS</div><h1>Ajustes y sincronización</h1><p>Guarda tus entrenamientos y, si conectas la nube, consúltalos desde móvil y ordenador.</p></div></div>
 <div class="settings-grid"><section class="surface settings-section"><h3>${ico('cloud','sm')} Sincronización entre dispositivos</h3><p>Tu diario se guarda primero en este navegador. Con <strong>Supabase</strong> puedes mantener el mismo progreso en el móvil y el ordenador usando siempre <strong>https://aurrera-running.vercel.app/</strong> y la misma cuenta.</p>
-${user?`<div class="notice ok">${ico('check-circle')}<div><strong>Sesión iniciada</strong><br>Has accedido como ${esc(user.email||'usuario')}. ${state.syncState==='synced'?'Tus registros están sincronizados.':state.syncState==='error'?`No se ha podido sincronizar: ${esc(state.syncError)}`:'Tus datos locales quedan guardados y se sincronizarán cuando haya conexión.'}</div></div><div class="user-badge">${ico('user','sm')} ${esc(user.email||'Cuenta conectada')}</div><p class="auth-remember-inline">${ico('cloud','sm')} ${state.rememberSession?'La sesión se recordará en este dispositivo.':'La sesión dura solo mientras mantengas abierto este navegador.'} <button type="button" class="auth-link" data-action="auth-remember-toggle">${state.rememberSession?'No recordar':'Mantener iniciada'}</button></p><div class="button-row"><button class="btn-primary" data-action="sync-now">${ico('refresh','sm')} Sincronizar ahora</button><button class="btn-outline" data-action="logout">${ico('logout','sm')} Cerrar sesión</button></div>${state.lastSync?`<p class="muted-small">Última sincronización: ${ucfirst(new Date(state.lastSync).toLocaleString('es-ES'))}</p>`:''}`:
+${user?`<div class="notice ok">${ico('check-circle')}<div><strong>Sesión iniciada</strong><br>Has accedido como ${esc(user.email||'usuario')}. ${state.syncState==='synced'?'Tus registros están sincronizados.':state.syncState==='error'?`No se ha podido sincronizar: ${esc(state.syncError)}`:'Tus datos locales quedan guardados y se sincronizarán cuando haya conexión.'}</div></div><div class="user-badge">${ico('user','sm')} ${esc(user.email||'Cuenta conectada')}</div><p id="auto-sync-info" class="muted-small" style="color:#387c5b;font-weight:750;margin:10px 0 14px">Actualización automática activada</p><p class="auth-remember-inline">${ico('cloud','sm')} ${state.rememberSession?'La sesión se recordará en este dispositivo.':'La sesión dura solo mientras mantengas abierto este navegador.'} <button type="button" class="auth-link" data-action="auth-remember-toggle">${state.rememberSession?'No recordar':'Mantener iniciada'}</button></p><div class="button-row"><button class="btn-primary" data-action="sync-now">${ico('refresh','sm')} Sincronizar ahora</button><button class="btn-outline" data-action="logout">${ico('logout','sm')} Cerrar sesión</button></div>${state.lastSync?`<p class="muted-small">Última sincronización: ${ucfirst(new Date(state.lastSync).toLocaleString('es-ES'))}</p>`:''}`:
  `<div class="notice">${ico('info')}<div><strong>${ready?'Proyecto configurado':'Estás en modo local'}</strong><br>${ready?'Ahora puedes registrarte o iniciar sesión.':'En este momento tus cambios solo se guardan en este navegador. Configura un proyecto Supabase para activar la nube.'}</div></div>`}
 <div class="detail-subtitle" style="margin-top:24px">1 · Conexión a Supabase</div>
 <div class="form-row"><label for="sb-url">URL del proyecto</label><input id="sb-url" class="field-input" type="url" autocomplete="off" placeholder="https://xxxxx.supabase.co" value="${esc(state.config.url||'')}"></div>
@@ -642,7 +642,7 @@ function openModal(date){const d=DAY_MAP[date];if(!d)return;state.modalDate=date
 function closeModal(){const el=document.getElementById('dialog-root');if(el)el.innerHTML='';state.modalDate=null;document.body.style.overflow='';}
 function updateEntry(date,patch,refresh=true){if(!DAY_MAP[date])return;state.entries[date]={...entryFor(date),...patch,updated_at:new Date().toISOString()};persistEntries();scheduleSync();if(refresh){render();if(state.modalDate)openModal(state.modalDate);}}
 function configReady(){try{const u=new URL(state.config.url);return u.protocol==='https:'&&!!state.config.key&&state.config.key.length>12;}catch{return false;}}
-function saveConfig(){const url=document.getElementById('sb-url')?.value.trim().replace(/\/$/,'')||'';const key=document.getElementById('sb-key')?.value.trim()||'';if(url&&(!url.startsWith('https://')||!key)){notify('Introduce una URL HTTPS y una clave pública válida.');return;}if(state.session&&url!==state.config.url){notify('Cierra sesión antes de cambiar de proyecto Supabase.');return;}state.config={url,key};localStorage.setItem(CONFIG_KEY,JSON.stringify(state.config));notify('Conexión guardada en este navegador.');render();}
+function saveConfig(){const url=document.getElementById('sb-url')?.value.trim().replace(/\/$/,'')||'';const key=document.getElementById('sb-key')?.value.trim()||'';if(url&&(!url.startsWith('https://')||!key)){notify('Introduce una URL HTTPS y una clave pública válida.');return;}if(state.session&&url!==state.config.url){notify('Cierra sesión antes de cambiar de proyecto Supabase.');return;}state.config={url,key};localStorage.setItem(CONFIG_KEY,JSON.stringify(state.config));window.AurreraAutoSync?.stop();window.AurreraAutoSync?.start();notify('Conexión guardada en este navegador.');render();}
 let runningSync=false, queuedSync=false,syncTimer=null;
 function scheduleSync(){if(!state.session?.user?.id||!configReady())return;clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncCloud(),850);}
 function setSync(kind,error=''){state.syncState=kind;state.syncError=error;updateSync();}
@@ -654,8 +654,10 @@ function persistSession(sess,remember=state.rememberSession){
  const other=state.rememberSession?sessionStorage:localStorage;
  store.setItem(SESSION_KEY,JSON.stringify(sess));
  other.removeItem(SESSION_KEY);
+ window.AurreraAutoSync?.authChanged();
 }
 function clearStoredSession(){
+ window.AurreraAutoSync?.stop();
  localStorage.removeItem(SESSION_KEY);
  sessionStorage.removeItem(SESSION_KEY);
  state.session=null;
@@ -685,10 +687,68 @@ async function refreshSession(){
 async function ensureSession(){if(!state.session?.access_token)throw new Error('Inicia sesión para sincronizar.');if(state.session.expires_at&&Date.now()>state.session.expires_at-120000)await refreshSession();}
 async function api(tablePath,method='GET',payload,refreshAllowed=true){await ensureSession();const headers={'apikey':state.config.key,'Authorization':`Bearer ${state.session.access_token}`,'Content-Type':'application/json'};if(method==='POST')headers.Prefer='resolution=merge-duplicates,return=minimal';const options={method,headers};if(payload!==undefined)options.body=JSON.stringify(payload);let res=await fetch(`${state.config.url}/rest/v1/${tablePath}`,options);if(res.status===401&&refreshAllowed){await refreshSession();return api(tablePath,method,payload,false);}if(!res.ok){let json={};try{json=await res.json();}catch{}throw new Error(json.message||json.error||`Error de sincronización ${res.status}. Revisa tabla y políticas RLS.`);}if(res.status===204||method==='POST')return null;return res.json();}
 function latestMerge(remote,local){let combined={...remote};for(let [date,e] of Object.entries(local)){if(!DAY_MAP[date]||!e||typeof e!=='object')continue;const t1=Date.parse(e.updated_at||'1970-01-01');const t2=Date.parse(combined[date]?.updated_at||'1970-01-01');if(!combined[date]||t1>=t2)combined[date]=e;}return combined;}
-async function syncCloud(){if(!state.session?.user?.id||!configReady())return;if(runningSync){queuedSync=true;return;}runningSync=true;setSync('syncing');try{let uid=state.session.user.id;const rows=await api(`running_entries?user_id=eq.${encodeURIComponent(uid)}&select=day_key,status,actual_km,rpe,note,result_time,updated_at`);let remote={};for(const r of (rows||[])){remote[r.day_key]={status:r.status||'pending',actual_km:r.actual_km===null?null:Number(r.actual_km),rpe:r.rpe,note:r.note||'',result_time:r.result_time||'',updated_at:r.updated_at};}
-let local=latestMerge(loadEntries(entryKey()),state.entries);let merged=latestMerge(remote,local);const upload=Object.entries(merged).filter(([date,e])=>{const other=remote[date];return !other||Date.parse(e.updated_at||'1970-01-01')>Date.parse(other.updated_at||'1970-01-01');}).map(([day_key,e])=>({user_id:uid,day_key,status:e.status||'pending',actual_km:e.actual_km===undefined||e.actual_km===''?null:e.actual_km,rpe:e.rpe===undefined||e.rpe===''?null:e.rpe,note:String(e.note||'').slice(0,1200),result_time:String(e.result_time||'').slice(0,12),updated_at:e.updated_at||new Date().toISOString()}));
-if(upload.length){await api('running_entries?on_conflict=user_id,day_key','POST',upload);}state.entries=latestMerge(merged,loadEntries(entryKey()));persistEntries();state.lastSync=new Date().toISOString();setSync('synced');if(state.tab!=='settings'&&!state.modalDate)render();if(state.tab==='settings')render();
-}catch(err){setSync('error',err.message||'Error no identificado');if(state.tab==='settings')render();console.warn('Sincronización no disponible:',err);}finally{runningSync=false;if(queuedSync){queuedSync=false;setTimeout(syncCloud,1100);}}}
+async function syncCloud(silent=false){
+ if(!state.session?.user?.id||!configReady())return;
+ if(runningSync){queuedSync=true;return;}
+ runningSync=true;
+ const previousStatus=state.syncState;
+ if(!silent)setSync('syncing');
+ try{
+   const uid=state.session.user.id;
+   const rows=await api('running_entries?user_id=eq.'+encodeURIComponent(uid)+'&select=day_key,status,actual_km,rpe,note,result_time,updated_at');
+   if(state.session?.user?.id!==uid)return;
+   const remote={};
+   for(const r of rows||[]){
+     if(!DAY_MAP[r.day_key])continue;
+     remote[r.day_key]={
+       status:r.status||'pending',actual_km:r.actual_km===null?null:Number(r.actual_km),
+       rpe:r.rpe,note:r.note||'',result_time:r.result_time||'',updated_at:r.updated_at
+     };
+   }
+   const local=latestMerge(loadEntries(entryKey()),state.entries);
+   const merged=latestMerge(remote,local);
+   const upload=Object.entries(merged).filter(([date,e])=>{
+     const other=remote[date];
+     return !other||Date.parse(e.updated_at||'1970-01-01')>Date.parse(other.updated_at||'1970-01-01');
+   }).map(([day_key,e])=>({
+     user_id:uid,day_key,status:e.status||'pending',
+     actual_km:e.actual_km===undefined||e.actual_km===''?null:e.actual_km,
+     rpe:e.rpe===undefined||e.rpe===''?null:e.rpe,
+     note:String(e.note||'').slice(0,1200),
+     result_time:String(e.result_time||'').slice(0,12),
+     updated_at:e.updated_at||new Date().toISOString()
+   }));
+   if(upload.length)await api('running_entries?on_conflict=user_id,day_key','POST',upload);
+   if(state.session?.user?.id!==uid)return;
+   // Preserve a local edit made while an asynchronous fetch was in progress.
+   const latestLocal=latestMerge(loadEntries(entryKey()),state.entries);
+   const next=latestMerge(merged,latestLocal);
+   const changed=JSON.stringify(state.entries)!==JSON.stringify(next);
+   state.entries=next;
+   if(changed)persistEntries();
+   state.lastSync=new Date().toISOString();
+   setSync('synced');
+   // Never rebuild the whole page every few seconds: keep inputs and scroll stable.
+   if(changed){
+     const editing=document.activeElement?.matches?.('[data-entry-field]')===true;
+     if(!editing){
+       render();
+       if(state.modalDate)openModal(state.modalDate);
+     }
+   }else if(state.tab==='settings'&&previousStatus!=='synced'&&
+      !document.activeElement?.matches?.('input,textarea,select')){
+     render();
+   }
+ }catch(err){
+   setSync('error',err.message||'Error no identificado');
+   if(!silent&&state.tab==='settings'&&
+       !document.activeElement?.matches?.('input,textarea,select'))render();
+   console.warn('Sincronización no disponible:',err);
+ }finally{
+   runningSync=false;
+   if(queuedSync){queuedSync=false;setTimeout(()=>syncCloud(true),650);}
+ }
+}
 
 function authFeedback(message,type='error'){
  if(!state.session&&!state.entryDismissed){
@@ -823,15 +883,18 @@ document.addEventListener('input',e=>{const input=e.target.closest('[data-entry-
 document.addEventListener('change',async e=>{if(e.target.id==='import-file'&&e.target.files?.[0]){await importEntries(e.target.files[0]);e.target.value='';}});
 document.addEventListener('click',e=>{if(e.target?.dataset?.overlay)closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.modalDate)closeModal();});
-window.addEventListener('focus',()=>{if(state.session)syncCloud();});
-window.addEventListener('online',()=>{if(state.session)syncCloud();});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.session)syncCloud();});
-setInterval(()=>{if(document.visibilityState==='visible'&&state.session)syncCloud();},60000);
+window.addEventListener('focus',()=>{if(state.session)syncCloud(true);});
+window.addEventListener('online',()=>{if(state.session)syncCloud(true);});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&state.session)syncCloud(true);});
+// Fallback: if the Realtime socket is unavailable, changes still appear
+// automatically while this page is open (no manual refresh required).
+setInterval(()=>{if(document.visibilityState==='visible'&&state.session)syncCloud(true);},15000);
 renderShell();
 if(state.session&&configReady())syncCloud();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
 </script>
 <script src="./intervals.js" defer></script>
+<script src="./autorefresh.js" defer></script>
 </body>
 </html>
