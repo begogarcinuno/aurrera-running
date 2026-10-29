@@ -64,3 +64,36 @@ Abre la URL de la web con Safari en tu iPhone y pulsa **Compartir > Añadir a pa
 | `assets/` | Vistas previas en el README |
 
 Consulta la documentación oficial de [GitHub Pages](https://docs.github.com/es/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) y la de [Supabase URL Configuration](https://supabase.com/docs/guides/auth/redirect-urls) si necesitas ampliar detalles.
+
+
+## Conexión con Intervals.icu
+
+Aurrera Running incluye un panel Intervals.icu en Ajustes y nube y resúmenes en Calendario y Progreso. Consulta actividades de carrera y trail entre el 29/10/2026 y el 14/02/2027. Permite comprobar distancia, duración, ritmo y desnivel, y registrar cada actividad en el plan únicamente después de una confirmación.
+
+### Vía rápida: clave API personal
+
+1. Accede a https://intervals.icu/settings y busca Developer Settings.
+2. Genera o consulta la clave API personal.
+3. En Aurrera, abre Ajustes y nube → Intervals.icu, introduce la clave en el campo privado y pulsa Conectar.
+4. Revisa el progreso o registra una actividad en el plan.
+
+Seguridad: la clave se usa para las peticiones directas del navegador a la API y se mantiene solo en sessionStorage. Nunca debe incluirse en GitHub, en un chat, en enlaces, capturas ni archivos compartidos. Tendrás que conectarte por separado en cada navegador.
+
+### Vía OAuth PKCE
+
+Intervals.icu soporta OAuth para clientes públicos SPA desde el 22 de octubre de 2026:
+
+1. Solicita una aplicación en https://intervals.icu/oauth/apply y espera su aprobación.
+2. En https://intervals.icu/settings/apps, abre Manage App y activa Public Client y Require PKCE.
+3. Registra como Redirect URI exacta: https://begogarcinuno.github.io/aurrera-running/
+4. Copia solo el Client ID en Aurrera y pulsa Autorizar con Intervals.icu.
+
+La aplicación pide únicamente ACTIVITY:READ; no escribe datos en Intervals.icu ni necesita client_secret.
+
+### Restricciones y limitaciones
+
+La API no proporciona todos los datos de actividades importadas únicamente desde Strava. Usa conexiones directas del reloj/dispositivo desde https://intervals.icu/settings/connections para tener acceso a las actividades permitidas. Los tokens se mantienen por sesión en el navegador y NO se sincronizan entre dispositivos. La sincronización de registros de Aurrera entre móvil y ordenador sigue requiriendo activar Supabase.
+
+Fuentes oficiales:
+- https://forum.intervals.icu/t/api-access-to-intervals-icu/609
+- https://forum.intervals.icu/t/intervals-icu-oauth-support/2759
