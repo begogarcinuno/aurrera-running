@@ -26,6 +26,9 @@
     runs: [], stravaStubs: 0, loading: false, lastSync: null, error: '', notice: '',
     loaded: false
   };
+  // Keep the restored credential available for reloads while this tab remains open,
+  // including after switching from persistent storage back to session-only mode.
+  if (icu.key && !icu.token && !previousSessionKey) sessionStorage.setItem(C_KEY,icu.key);
   const escape = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const kmStr = n => Number(n).toLocaleString('es-ES', {maximumFractionDigits:1});
   const connected = () => !!(icu.token || icu.key);
