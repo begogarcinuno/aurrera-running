@@ -38,3 +38,8 @@
 .icu-link-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .icu-loading{opacity:.72}
 @media(max-width:630px){.icu-card{padding:18px 15px;border-radius:16px}.icu-brand h3{font-size:18px}.icu-form{display:flex;flex-direction:column;align-items:stretch}.icu-form>div{width:100%}.icu-btn{width:auto;min-height:38px}.icu-form>.icu-btn{width:100%}.icu-stat{padding:11px 8px}.icu-stat b{font-size:19px}.icu-stat small{font-size:9px}.icu-activity{padding:10px;align-items:flex-start}.icu-activity .icu-btn{font-size:9px;padding:7px 9px;min-height:32px}.icu-banner{padding:13px 15px}.icu-banner .icu-btn{font-size:10px}}
+
+.icu-checkbox{display:flex;align-items:flex-start;gap:11px;margin:12px 0 9px;padding:13px 14px;border-radius:12px;border:1px solid #d5e9e0;background:#eff9f3;cursor:pointer;color:#385e58}
+.icu-checkbox input{width:17px;height:17px;accent-color:#27805f;margin:2px 0 0;flex:none}
+.icu-checkbox span{display:flex;flex-direction:column;gap:4px}.icu-checkbox strong{font-size:12px;line-height:1.3}.icu-checkbox small{font-size:10.5px;line-height:1.55;color:#68857d;font-weight:500}
+.icu-notice strong{font-weight:800}
