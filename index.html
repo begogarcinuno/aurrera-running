@@ -304,7 +304,7 @@ const ico=(id,extra='')=>`<svg class="icon ${extra}" aria-hidden="true"><use hre
 const fmtKm=n=>(Math.round(n*10)/10).toLocaleString('es-ES',{maximumFractionDigits:1});
 const currentWeekIndex=(()=>{const td=nowDate();let ix=WEEKS.findIndex(w=>w.start<=td&&td<=w.dateEnd);return ix<0?(td<PLAN.start?0:WEEKS.length-1):ix})();
 const initDate=DAY_MAP[nowDate()]?nowDate():PLAN.start;
-let state={tab:'home',weekIndex:currentWeekIndex,calWeekIndex:currentWeekIndex,selectedDate:initDate,calMode:'week',month:initDate.slice(0,7),modalDate:null,entries:{},config:{url:SUPABASE_URL,key:SUPABASE_ANON_KEY,...safeJSON(localStorage.getItem(CONFIG_KEY),{})},session:safeJSON(localStorage.getItem(SESSION_KEY),null),syncState:'local',syncText:'Modo local',syncError:'',lastSync:null};
+let state={tab:'home',weekIndex:currentWeekIndex,calWeekIndex:currentWeekIndex,selectedDate:initDate,calMode:'week',month:initDate.slice(0,7),modalDate:null,entries:{},config:(()=>{const saved=safeJSON(localStorage.getItem(CONFIG_KEY),{});return {url:saved.url||SUPABASE_URL,key:saved.key||SUPABASE_ANON_KEY};})(),session:safeJSON(localStorage.getItem(SESSION_KEY),null),syncState:'local',syncText:'Modo local',syncError:'',lastSync:null};
 const entryKey=()=>state.session?.user?.id ? `hiru.running.entries.${state.session.user.id}.v1`:GUEST_KEY;
 function loadEntries(key){return safeJSON(localStorage.getItem(key),{});}
 state.entries=loadEntries(entryKey());
