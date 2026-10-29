@@ -11,6 +11,9 @@ create table if not exists public.running_entries (
  primary key(user_id,day_key)
 );
 alter table public.running_entries enable row level security;
+-- Denegar el acceso por defecto. Solo las sesiones autenticadas recibiran
+-- los permisos minimos para consultar o actualizar sus propios registros.
+revoke all on table public.running_entries from anon, authenticated;
 drop policy if exists "running_entries_select_own" on public.running_entries;
 drop policy if exists "running_entries_insert_own" on public.running_entries;
 drop policy if exists "running_entries_update_own" on public.running_entries;
