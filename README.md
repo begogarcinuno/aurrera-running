@@ -2,7 +2,7 @@
 
 Aplicación web de entrenamiento de running, con calendario visual, seguimiento de progreso y tres carreras como objetivos: Santurce-Bilbao (15 km, 29/11/2026), Etxebarri X-Treme (10 km trail, 06/12/2026) y Donosti 10K (14/02/2027).
 
-La web se publica con **GitHub Pages**. No necesitas servidor web, instalar Node.js ni compilar nada: `index.html` contiene toda la aplicación.
+La web principal se publica en **Vercel**: https://aurrera-running.vercel.app/. También se conserva la publicación mediante GitHub Pages. No necesitas servidor web, instalar Node.js ni compilar nada: `index.html` contiene toda la aplicación.
 
 ## 1. Crear el repositorio GitHub
 
@@ -23,29 +23,37 @@ La web se publica con **GitHub Pages**. No necesitas servidor web, instalar Node
 
 > **Importante:** la URL anterior es solo un ejemplo, no un enlace ya publicado. No es necesario crear un archivo llamado `CNAME` para usar el dominio normal de GitHub Pages.
 
-La web utiliza rutas relativas (`./...`) y funciona también cuando GitHub Pages la sirve desde la subcarpeta del repositorio.
+La web utiliza rutas relativa## 3. Sincronizar entrenamientos entre móvil y ordenador con Supabase
 
-## 3. Sincronizar los entrenamientos entre móvil y ordenador
+La web está publicada, pero guardar una marca en el navegador de tu teléfono no la copia al ordenador hasta que configures la base de datos. El código de sincronización ya está incluido: no es necesario instalar dependencias ni convertir el HTML en una aplicación diferente.
 
-**GitHub Pages aloja la web pero no guarda ni sincroniza tus entrenamientos.** Para ello se utiliza Supabase, que es opcional hasta que quieras sincronizar. Sin esta configuración, las marcas se guardan solo en el navegador actual.
+### Preparar el proyecto una sola vez
 
-1. Crea un proyecto en https://supabase.com/dashboard .
-2. En Supabase > **SQL Editor**, ejecuta el contenido de `supabase_setup.sql`. Crea una tabla con seguridad por usuario (RLS).
-3. En Supabase > **Project Settings / API Keys**, localiza **Project URL** y la clave **anon/publishable**.
-4. Abre `index.html` en un editor y busca estas constantes:
+1. Accede a https://supabase.com/dashboard . Si ya tienes un proyecto para Aurrera, reutilízalo; de lo contrario, crea uno nuevo (por ejemplo `aurrera-running`). Utiliza una contraseña de base de datos robusta y guárdala en tu gestor de contraseñas. Esa contraseña **no** es la clave pública ni se introduce en Aurrera.
+2. En el proyecto, abre **SQL Editor → New query** y pega íntegro el archivo [supabase_setup.sql](./supabase_setup.sql). Ejecuta **Run**. Se crea `public.running_entries` con seguridad Row Level Security (RLS): las cuentas autenticadas solo pueden consultar/modificar sus propios entrenamientos. No se concede acceso a los visitantes anónimos.
+3. En el panel de Supabase abre **Connect** (o **Project Settings → API Keys**) y busca **Project URL** y **Publishable key** (`sb_publishable_...`). Copia solo esos dos datos públicos. Nunca copies la base de datos, un secreto `sb_secret_...` ni la `service_role` a una página web o repositorio.
+4. En **Authentication → URL Configuration**, configura **Site URL** como `https://aurrera-running.vercel.app/`. Si mantienes también la web de GitHub Pages, puedes añadir `https://begogarcinuno.github.io/aurrera-running/` a **Redirect URLs**. Conserva activa la confirmación del correo electrónico.
+5. Abre la web https://aurrera-running.vercel.app/ → **Ajustes y nube**. Pega la URL del proyecto y la clave **pública** y pulsa **Guardar conexión**. En el apartado **Tu cuenta personal**, regístrate con un correo y una contraseña nuevos para Aurrera. Confirma el correo si Supabase lo solicita; después inicia sesión.
+6. Repite la configuración de URL y clave pública en el móvil o el ordenador que falte, entra con el **mismo correo y contraseña** y pulsa **Sincronizar ahora**. Cuando los datos estén sincronizados, las marcas se reflejarán en los dos.
 
-   ```js
-   const SUPABASE_URL = '';
-   const SUPABASE_ANON_KEY = '';
-   ```
+**Importante:** la URL y clave pública se guardan por navegador. Si quieres evitar pegarlas dos veces, se pueden publicar como constantes en `index.html` porque **son públicas**, pero solo después de comprobar la seguridad RLS. Vercel no inyecta automáticamente variables de entorno en este HTML estático; guardar una variable en Vercel sin adaptar el código no funcionará.
 
-   Sustituye los valores vacíos por la URL de tu proyecto y la clave **pública**. Guarda y vuelve a subir el `index.html` actualizado al repositorio (es un nuevo commit).
-5. En Supabase > **Authentication > URL Configuration**, configura **Site URL** con la URL HTTPS exacta de tu web de GitHub Pages (por ejemplo `https://TU-USUARIO.github.io/aurrera-running/`). Si usas enlaces de confirmación o flujos con redirección, añade también esa URL a **Redirect URLs**.
-6. En la web, abre **Ajustes y nube**, crea una cuenta con tu correo, confirma el email si te lo solicita e inicia sesión con la misma cuenta en móvil y ordenador.
+**Correos de confirmación:** el servidor SMTP gratuito de prueba de Supabase puede enviar solo a direcciones de los miembros del equipo del proyecto y tiene límites estrictos. Para una primera cuenta personal, utiliza el correo con el que creaste el proyecto; si necesitas otras direcciones, configura un proveedor SMTP. No desactives la verificación de correos solo para eludir ese límite.
 
-Puedes introducir la URL y clave pública desde Ajustes y nube de la app en vez de editar el HTML, pero entonces deberás configurarlas en cada navegador por separado.
+### Comprobación de que funciona
 
-**Seguridad:** nunca pongas una `service_role`, `sb_secret_...`, contraseñas ni tokens de sesión en este repositorio. Aunque el repositorio sea privado, la web de GitHub Pages puede ser pública. Las claves `anon`/`publishable` están diseñadas para uso desde el navegador cuando las políticas RLS están bien configuradas.
+1. En el móvil, abre **Mi calendario** y marca una sesión como **Completada**.
+2. Espera a que aparezca el indicador de sincronización completada o pulsa **Sincronizar ahora**.
+3. En el ordenador, abre **exactamente** `https://aurrera-running.vercel.app/` con la misma cuenta de Aurrera y pulsa **Sincronizar ahora**.
+4. Comprueba que el mismo entrenamiento aparece completado en el ordenador.
+
+### Si ya tenías entrenamientos guardados en GitHub Pages
+
+Los registros locales de GitHub Pages y los de Vercel viven en orígenes distintos del navegador; no se copian automáticamente. En la web antigua, abre **Ajustes y nube → Exportar diario**. En la web de Vercel, utiliza **Importar diario** y después **Sincronizar ahora**. Conserva el archivo JSON como copia de seguridad. **Intervals.icu** y **Supabase** tienen funciones diferentes: Intervals.icu consulta actividad registrada por dispositivos; Supabase sincroniza el calendario propio de Aurrera.
+
+Documentación oficial: [Supabase: claves públicas](https://supabase.com/docs/guides/getting-started/api-keys), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security) y [URLs de autenticación](https://supabase.com/docs/guides/auth/redirect-urls).
+
+e` están diseñadas para uso desde el navegador cuando las políticas RLS están bien configuradas.
 
 ## 4. Añadir al inicio del iPhone
 
