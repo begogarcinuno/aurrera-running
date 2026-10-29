@@ -1,0 +1,40 @@
+
+/* Intervals.icu · Integración externa Aurrera */
+.icu-card{margin:0 0 22px;background:#fff;border:1px solid #dce8e9;border-radius:20px;padding:24px;box-shadow:0 8px 28px rgba(28,58,73,.045);overflow:hidden}
+.icu-head{display:flex;align-items:center;gap:13px;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}
+.icu-brand{display:flex;align-items:center;gap:12px}.icu-mark{width:45px;height:45px;flex:none;display:grid;place-items:center;border-radius:14px;color:#fff;font:800 25px Outfit,'Segoe UI',sans-serif;background:linear-gradient(135deg,#275c78,#2a8c9e)}
+.icu-brand small{font-weight:800;letter-spacing:1.3px;color:#6f8790;text-transform:uppercase;font-size:9px}.icu-brand h3{margin:2px 0 0;font:750 20px Outfit,'Segoe UI',sans-serif;color:#193046}
+.icu-badge{font-size:11px;font-weight:750;letter-spacing:.15px;border-radius:999px;padding:7px 11px;background:#f2f5f8;color:#60758b;display:inline-flex;align-items:center;gap:6px}
+.icu-badge:before{content:'';height:7px;width:7px;border-radius:50%;background:#f0ac65}
+.icu-badge.ok{background:#ecf8ed;color:#3d855b}.icu-badge.ok:before{background:#51ae78}
+.icu-lead{color:#63778a;font-size:12.5px;line-height:1.6;margin:0 0 18px}
+.icu-form{display:grid;grid-template-columns:1fr auto;align-items:end;gap:10px;margin:12px 0}
+.icu-form label{display:block;font-size:11px;font-weight:800;color:#576a81;margin-bottom:6px}
+.icu-form input{width:100%;background:#fafcfd;border:1px solid #dbe5ec;border-radius:10px;padding:11px 12px;outline:none;font-size:13px}
+.icu-form input:focus{border-color:#6baba6;box-shadow:0 0 0 3px #75beb32a}
+.icu-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:10px 13px;font-weight:800;font-size:11px;white-space:nowrap;border-radius:10px;background:#1e394d;color:#fff;transition:background .15s}
+.icu-btn:hover{background:#275b67}.icu-btn.secondary{color:#1d5464;background:#eaf4f4}.icu-btn.secondary:hover{background:#d8ebea}.icu-btn.ghost{color:#465b70;background:#f1f4f8}.icu-btn:disabled{opacity:.5}
+.icu-buttons{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:13px}
+.icu-inline-link{color:#147586;text-decoration:underline;text-underline-offset:3px;font-size:11px;font-weight:750}
+.icu-help{margin:8px 0 0;font-size:11px;line-height:1.6;color:#7d8e9d}
+.icu-notice{background:#f0f7f8;border:1px solid #d8e9eb;border-radius:11px;padding:12px 14px;color:#396375;font-size:11.5px;line-height:1.6;margin:12px 0}
+.icu-notice.error{background:#fff3ef;border-color:#f4ded4;color:#a34f47}
+.icu-division{display:flex;align-items:center;gap:13px;margin:18px 0;color:#93a1ac;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:800}
+.icu-division:before,.icu-division:after{content:'';height:1px;background:#e3e9ef;flex:1}
+.icu-steps{padding-left:18px;margin:9px 0;color:#64798c;font-size:11px;line-height:1.9}
+.icu-steps li{padding-left:2px}
+.icu-progress-bar{height:8px;background:#eaf0f2;border-radius:99px;overflow:hidden;margin-top:11px}
+.icu-progress-bar>span{height:100%;background:linear-gradient(90deg,#77b7a4,#2c8290);display:block;border-radius:99px;min-width:0}
+.icu-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}
+.icu-stat{padding:14px;border-radius:13px;background:#f3f8f8}.icu-stat b{display:block;font:750 24px Outfit,'Segoe UI',sans-serif;color:#1e4754;letter-spacing:-.5px}.icu-stat small{font-weight:700;font-size:10px;color:#7a8d99}
+.icu-activities{display:flex;flex-direction:column;gap:7px;margin-top:14px}
+.icu-activity{display:flex;justify-content:space-between;align-items:center;gap:13px;padding:12px;background:#fcfdfd;border:1px solid #e8eef0;border-radius:12px}
+.icu-activity-main{flex:1;min-width:0}.icu-activity-main strong{font-size:12px;color:#253c51;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.icu-activity-main small{font-size:10.5px;color:#8595a4;display:block;margin-top:3px}
+.icu-footnote{font-size:10px;color:#8a9da7;margin-top:10px}
+.icu-section-name{font-size:12px;font-weight:850;color:#38586c;margin:15px 0 5px}
+.icu-banner{border:1px solid #d6e9e7;border-radius:16px;padding:15px 19px;margin:0 0 15px;background:linear-gradient(112deg,#eaf6ef,#edf7f7);display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.icu-banner strong{color:#2b5963;font-weight:850;font-size:13px}.icu-banner p{color:#557984;font-size:11px;margin:3px 0 0}
+.icu-mini-pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 11px;background:white;color:#3a6b73;font-size:11px;font-weight:800}
+.icu-link-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.icu-loading{opacity:.72}
+@media(max-width:630px){.icu-card{padding:18px 15px;border-radius:16px}.icu-brand h3{font-size:18px}.icu-form{display:flex;flex-direction:column;align-items:stretch}.icu-form>div{width:100%}.icu-btn{width:auto;min-height:38px}.icu-form>.icu-btn{width:100%}.icu-stat{padding:11px 8px}.icu-stat b{font-size:19px}.icu-stat small{font-size:9px}.icu-activity{padding:10px;align-items:flex-start}.icu-activity .icu-btn{font-size:9px;padding:7px 9px;min-height:32px}.icu-banner{padding:13px 15px}.icu-banner .icu-btn{font-size:10px}}
