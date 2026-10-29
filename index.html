@@ -231,7 +231,54 @@
 .cal-swipe-hint{display:none}
 @media(max-width:630px){.cal-workspace{scroll-margin-top:78px}.cal-roadmap-foot{flex-wrap:wrap}.cal-swipe-hint{display:block;flex-basis:100%;text-align:center;color:#799687;font-weight:750;margin-top:1px}}
 
- </style>
+ 
+/* Acceso inicial · Aurrera */
+.auth-entry{min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:minmax(0,47%) minmax(0,53%);background:#fff;color:var(--ink)}
+.auth-entry-brand{position:relative;isolation:isolate;overflow:hidden;min-height:100vh;padding:clamp(32px,5.4vw,80px);background:#151e32;color:#f7fbf9;display:flex;flex-direction:column;justify-content:space-between}
+.auth-entry-brand:before{content:"";position:absolute;z-index:-1;width:480px;height:480px;top:23%;right:-285px;border:1px solid rgba(197,236,176,.17);border-radius:50%;box-shadow:0 0 0 52px rgba(197,236,176,.035),0 0 0 110px rgba(197,236,176,.025);pointer-events:none}
+.auth-entry-brand:after{content:"";position:absolute;z-index:-1;inset:auto -20% -28% auto;width:90%;aspect-ratio:1;background:radial-gradient(circle,rgba(104,163,130,.22),transparent 68%);pointer-events:none}
+.auth-entry-brand>*{position:relative;z-index:1}
+.auth-brand-logo{display:flex;align-items:center;gap:11px;font-family:Outfit,'Segoe UI',sans-serif;font-size:23px;font-weight:780;letter-spacing:-.75px}
+.auth-brand-logo b{color:#c6ecb0}.auth-brand-logo small{display:block;font:800 9px 'DM Sans','Segoe UI',sans-serif;letter-spacing:1.95px;color:#a2b0c1;margin-top:2px}
+.auth-brand-mark{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;background:#c6ecb0;color:#16243a;transform:rotate(-5deg)}.auth-brand-mark .icon{width:24px;height:24px;transform:rotate(5deg);stroke-width:2.6}
+.auth-brand-copy{max-width:510px;margin-top:auto;padding:70px 0 48px}.auth-brand-eyebrow{display:inline-flex;align-items:center;gap:9px;padding:9px 13px;border:1px solid #ffffff24;border-radius:100px;font-size:10px;letter-spacing:1.6px;font-weight:800;color:#c6ecb0}
+.auth-brand-copy h2{margin:24px 0 20px;font:710 clamp(38px,4.5vw,65px)/1.1 Outfit,'Segoe UI',sans-serif;letter-spacing:-1.9px;max-width:530px}.auth-brand-copy h2 em{font-style:normal;color:#c6ecb0}
+.auth-brand-copy p{font-size:14px;line-height:1.8;max-width:415px;color:#bdc9d7;margin:0}
+.auth-brand-bottom{padding-top:20px;border-top:1px solid #ffffff20;display:flex;align-items:center;gap:16px;font-size:11px;color:#b4c3d0;line-height:1.55}
+.auth-brand-bottom .icon{color:#c6ecb0;width:22px;height:22px}
+.auth-entry-login{display:flex;align-items:center;justify-content:center;padding:58px clamp(30px,7.5vw,110px);min-width:0}
+.auth-form-panel{width:100%;max-width:448px;margin:auto}
+.auth-kicker{display:inline-flex;align-items:center;gap:7px;font-size:10px;color:#648a7a;font-weight:850;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:16px}.auth-kicker .icon{width:16px;height:16px}
+.auth-form-panel h1{margin:0 0 11px;font:730 clamp(29px,3.5vw,40px)/1.17 Outfit,'Segoe UI',sans-serif;letter-spacing:-1.1px;color:#1b2b44}
+.auth-intro-text{font-size:13px;color:#778597;line-height:1.75;margin:0 0 32px}
+.auth-field{display:block;margin-bottom:19px}.auth-field>span{font-size:11px;font-weight:830;color:#3a4a61;display:block;margin-bottom:9px}
+.auth-field input{width:100%;min-height:50px;background:#fbfcfd;border:1px solid #dce4eb;border-radius:12px;padding:12px 15px;font-size:13px;color:#1d2d44;transition:border-color .15s,box-shadow .15s;outline:0}
+.auth-field input:focus{border-color:#679db3;box-shadow:0 0 0 4px #679db31f}
+.auth-field input::placeholder{color:#a5afbd}
+.auth-remember{display:flex;align-items:flex-start;gap:11px;margin:5px 0 21px;cursor:pointer}
+.auth-remember input{margin:2px 0 0;width:17px;height:17px;accent-color:#3b8668;flex:none}
+.auth-remember span{display:flex;flex-direction:column;gap:3px}
+.auth-remember strong{color:#2b3e55;font-size:12px;font-weight:820}
+.auth-remember small{font-size:10.5px;line-height:1.5;color:#8593a2}
+.auth-submit{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:50px;background:#1e324c;color:#fff;border:0;border-radius:12px;font-size:12px;font-weight:850;box-shadow:0 11px 22px rgba(20,38,61,.12);transition:transform .15s,background .15s}
+.auth-submit:hover{background:#2d4a63;transform:translateY(-1px)}.auth-submit:disabled{opacity:.58;cursor:wait}
+.auth-feedback{border-radius:12px;padding:12px 14px;display:flex;gap:9px;align-items:flex-start;font-size:12px;line-height:1.55;margin:-9px 0 22px}
+.auth-feedback .icon{width:17px;height:17px;margin-top:1px;flex:none}
+.auth-feedback.error{background:#fff0ec;color:#9b5446;border:1px solid #f2d9d2}
+.auth-feedback.success{background:#eff8ef;color:#42785a;border:1px solid #d6ecd7}
+.auth-switch{text-align:center;color:#7a8999;font-size:12px;margin:23px 0 0}
+.auth-link{font-size:inherit;font-weight:830;background:none;color:#32745f;padding:4px;border-radius:5px;text-decoration:underline;text-decoration-color:#8bc0a8;text-underline-offset:3px}
+.auth-link:hover{color:#1b5140}
+.auth-guest-wrap{display:flex;align-items:center;justify-content:center;border-top:1px solid #e9edf0;margin-top:29px;padding-top:23px}
+.auth-guest{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:#f4f7f7;color:#566a7e;padding:11px 16px;font-size:11px;font-weight:800;border-radius:10px}
+.auth-guest:hover{background:#e9f2f0}
+.auth-legal{font-size:10px;color:#98a6b4;line-height:1.55;margin:21px 0 0;text-align:center}
+.auth-remember-inline{background:#f5f9f7;padding:10px;border:1px solid #e2efe7;border-radius:10px;margin:12px 0;display:flex;align-items:flex-start;gap:9px;font-size:11px;color:#50695f;line-height:1.5}
+.auth-remember-inline input{margin:2px 0 0;accent-color:#3b8668}
+@media(max-width:800px){.auth-entry{grid-template-columns:1fr}.auth-entry-brand{min-height:auto;padding:25px 28px 27px}.auth-brand-copy{padding:28px 0 0;margin-top:0}.auth-brand-copy h2{font-size:26px;max-width:380px;margin:12px 0 8px;letter-spacing:-.7px}.auth-brand-copy p{font-size:12px;line-height:1.5}.auth-brand-eyebrow,.auth-brand-bottom{display:none}.auth-entry-login{padding:33px 28px 52px}.auth-form-panel{max-width:460px}}
+@media(max-width:400px){.auth-entry-brand{padding:18px 20px 20px}.auth-entry-login{padding:27px 20px 42px}.auth-form-panel h1{font-size:29px}.auth-intro-text{margin-bottom:23px}.auth-field{margin-bottom:14px}}
+
+</style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
@@ -304,7 +351,7 @@ const ico=(id,extra='')=>`<svg class="icon ${extra}" aria-hidden="true"><use hre
 const fmtKm=n=>(Math.round(n*10)/10).toLocaleString('es-ES',{maximumFractionDigits:1});
 const currentWeekIndex=(()=>{const td=nowDate();let ix=WEEKS.findIndex(w=>w.start<=td&&td<=w.dateEnd);return ix<0?(td<PLAN.start?0:WEEKS.length-1):ix})();
 const initDate=DAY_MAP[nowDate()]?nowDate():PLAN.start;
-let state={tab:'home',weekIndex:currentWeekIndex,calWeekIndex:currentWeekIndex,selectedDate:initDate,calMode:'week',month:initDate.slice(0,7),modalDate:null,entries:{},config:(()=>{const saved=safeJSON(localStorage.getItem(CONFIG_KEY),{});return {url:saved.url||SUPABASE_URL,key:saved.key||SUPABASE_ANON_KEY};})(),session:safeJSON(localStorage.getItem(SESSION_KEY),null),syncState:'local',syncText:'Modo local',syncError:'',lastSync:null};
+let state={tab:'home',weekIndex:currentWeekIndex,calWeekIndex:currentWeekIndex,selectedDate:initDate,calMode:'week',month:initDate.slice(0,7),modalDate:null,entries:{},config:(()=>{const saved=safeJSON(localStorage.getItem(CONFIG_KEY),{});return {url:saved.url||SUPABASE_URL,key:saved.key||SUPABASE_ANON_KEY};})(),session:safeJSON(sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY),null),rememberSession:!!localStorage.getItem(SESSION_KEY)||!sessionStorage.getItem(SESSION_KEY),entryDismissed:false,entryMode:'login',entryEmail:'',entryFeedback:null,entryBusy:false,syncState:'local',syncText:'Modo local',syncError:'',lastSync:null};
 const entryKey=()=>state.session?.user?.id ? `hiru.running.entries.${state.session.user.id}.v1`:GUEST_KEY;
 function loadEntries(key){return safeJSON(localStorage.getItem(key),{});}
 state.entries=loadEntries(entryKey());
@@ -325,7 +372,40 @@ function getBlockHeader(title,sub='',action=''){return `<div class="section-head
 function typeIcon(d){return `<span class="act-symbol ${d.type}">${ico(TYPE_ICONS[d.type]||'activity')}</span>`;}
 function statusNote(date){const s=entryStatus(date);return s==='done'?`${ico('check','sm')} Hecha`:s==='skipped'?'Omitida':'';}
 function syncClass(){return state.syncState==='synced'?'synced':state.syncState==='syncing'?'syncing':state.syncState==='error'?'error':'';}
-function renderShell(){document.getElementById('app').innerHTML=`
+
+function renderEntryGate(){
+  const signup=state.entryMode==='signup';
+  const feedback=state.entryFeedback?.text
+   ? '<div class="auth-feedback '+(state.entryFeedback.type==='success'?'success':'error')+'" role="status">'+ico(state.entryFeedback.type==='success'?'check-circle':'info')+'<span>'+esc(state.entryFeedback.text)+'</span></div>'
+   : '';
+  return '<div class="auth-entry">'+
+    '<aside class="auth-entry-brand">'+
+      '<div class="auth-brand-logo"><span class="auth-brand-mark">'+ico('route')+'</span><span>aurrera<b>.</b><small>RUNNING CLUB</small></span></div>'+
+      '<div class="auth-brand-copy"><div class="auth-brand-eyebrow">'+ico('spark','sm')+' TU CAMINO HACIA DONOSTI</div>'+
+        '<h2>Tu siguiente meta empieza <em>aquí.</em></h2>'+
+        '<p>Un entrenamiento cada vez. Tu calendario, tus carreras y tus avances siempre a mano, desde el móvil o el ordenador.</p>'+
+      '</div>'+
+      '<div class="auth-brand-bottom">'+ico('cloud')+'<span>Tu progreso guardado de forma segura y sincronizado entre dispositivos.</span></div>'+
+    '</aside>'+
+    '<main class="auth-entry-login"><div class="auth-form-panel">'+
+      '<div class="auth-kicker">'+ico('check-circle','sm')+' TU ESPACIO PERSONAL</div>'+
+      '<h1>'+(signup?'Crea tu cuenta':'¡Qué bien verte de nuevo!')+'</h1>'+
+      '<p class="auth-intro-text">'+(signup?'Regístrate para guardar tus entrenamientos en la nube y consultarlos desde cualquier dispositivo.':'Accede a tu plan de running. Tus entrenamientos te estarán esperando donde los dejaste.')+'</p>'+
+      feedback+
+      '<form id="auth-entry-form">'+
+        '<label class="auth-field" for="auth-email"><span>Correo electrónico</span><input id="auth-email" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="tu@email.com" value="'+esc(state.entryEmail||'')+'"></label>'+
+        '<label class="auth-field" for="auth-password"><span>Contraseña</span><input id="auth-password" name="password" type="password" autocomplete="'+(signup?'new-password':'current-password')+'" minlength="8" required placeholder="Mínimo 8 caracteres"></label>'+
+        '<label class="auth-remember" for="auth-remember"><input id="auth-remember" type="checkbox" '+(state.rememberSession?'checked':'')+'><span><strong>Mantener mi sesión iniciada</strong><small>No tendrás que iniciar sesión cada vez que abras Aurrera en este dispositivo.</small></span></label>'+
+        '<button class="auth-submit" type="submit" id="auth-entry-submit" '+(state.entryBusy?'disabled':'')+'>'+ico(signup?'user':'login','sm')+(signup?' Crear cuenta':' Iniciar sesión')+'</button>'+
+      '</form>'+
+      '<p class="auth-switch">'+(signup?'¿Ya tienes una cuenta?':'¿Es tu primera vez aquí?')+' <button type="button" class="auth-link" data-action="auth-toggle">'+(signup?'Iniciar sesión':'Crear cuenta')+'</button></p>'+
+      '<div class="auth-guest-wrap"><button type="button" class="auth-guest" data-action="auth-guest">Continuar sin iniciar sesión '+ico('chevron-right','sm')+'</button></div>'+
+      '<p class="auth-legal">Si continúas sin cuenta, los registros se guardarán solo en este navegador. Usa esta opción en un dispositivo personal.</p>'+
+    '</div></main>'+
+  '</div>';
+}
+
+function renderShell(){if(!state.session&&!state.entryDismissed){document.getElementById('app').innerHTML=renderEntryGate();return;}document.getElementById('app').innerHTML=`
  <div class="app-shell"><aside class="sidebar">
   <div class="logo"><div class="logo-mark">${ico('route')}</div><div class="logo-word-container"><div class="logo-word">aurrera<span style="color:var(--mint)">.</span></div><div class="logo-sub">RUNNING CLUB</div></div></div>
   <div class="side-label">Tu espacio</div>
@@ -544,14 +624,14 @@ function renderProgress(){const a=aggregate();const history=PLAN.days.filter(d=>
 <section class="surface">${getBlockHeader('Semana a semana','Plan detallado de kilómetros')}<div class="mile-list">${WEEKS.map((w,i)=>{let km=weekDays(w).filter(Boolean).reduce((sum,d)=>sum+doneKm(d),0);return `<div class="mile-item"><span class="wname">S${i+1} · ${dformat(w.start,{day:'numeric',month:'short'})}</span><span class="wtrack"><span style="width:${Math.min(100,w.planKm?Math.round(km/w.planKm*100):0)}%"></span></span><span class="wkm">${fmtKm(km)}/${fmtKm(w.planKm)}</span></div>`;}).join('')}</div><p class="muted-small" style="margin:19px 0 0">Los kilómetros son estimaciones, no obligaciones. Si bajas carga por dolor o cansancio, prioriza tu salud.</p></section></div>`;}
 function renderSettings(){const ready=configReady();const user=state.session?.user;return `<div class="page-title"><div><div class="eyebrow">TU CUENTA Y TUS DATOS</div><h1>Ajustes y sincronización</h1><p>Guarda tus entrenamientos y, si conectas la nube, consúltalos desde móvil y ordenador.</p></div></div>
 <div class="settings-grid"><section class="surface settings-section"><h3>${ico('cloud','sm')} Sincronización entre dispositivos</h3><p>Tu diario se guarda primero en este navegador. Con <strong>Supabase</strong> puedes mantener el mismo progreso en el móvil y el ordenador usando siempre <strong>https://aurrera-running.vercel.app/</strong> y la misma cuenta.</p>
-${user?`<div class="notice ok">${ico('check-circle')}<div><strong>Sesión iniciada</strong><br>Has accedido como ${esc(user.email||'usuario')}. ${state.syncState==='synced'?'Tus registros están sincronizados.':state.syncState==='error'?`No se ha podido sincronizar: ${esc(state.syncError)}`:'Tus datos locales quedan guardados y se sincronizarán cuando haya conexión.'}</div></div><div class="user-badge">${ico('user','sm')} ${esc(user.email||'Cuenta conectada')}</div><div class="button-row"><button class="btn-primary" data-action="sync-now">${ico('refresh','sm')} Sincronizar ahora</button><button class="btn-outline" data-action="logout">${ico('logout','sm')} Cerrar sesión</button></div>${state.lastSync?`<p class="muted-small">Última sincronización: ${ucfirst(new Date(state.lastSync).toLocaleString('es-ES'))}</p>`:''}`:
+${user?`<div class="notice ok">${ico('check-circle')}<div><strong>Sesión iniciada</strong><br>Has accedido como ${esc(user.email||'usuario')}. ${state.syncState==='synced'?'Tus registros están sincronizados.':state.syncState==='error'?`No se ha podido sincronizar: ${esc(state.syncError)}`:'Tus datos locales quedan guardados y se sincronizarán cuando haya conexión.'}</div></div><div class="user-badge">${ico('user','sm')} ${esc(user.email||'Cuenta conectada')}</div><p class="auth-remember-inline">${ico('cloud','sm')} ${state.rememberSession?'La sesión se recordará en este dispositivo.':'La sesión dura solo mientras mantengas abierto este navegador.'} <button type="button" class="auth-link" data-action="auth-remember-toggle">${state.rememberSession?'No recordar':'Mantener iniciada'}</button></p><div class="button-row"><button class="btn-primary" data-action="sync-now">${ico('refresh','sm')} Sincronizar ahora</button><button class="btn-outline" data-action="logout">${ico('logout','sm')} Cerrar sesión</button></div>${state.lastSync?`<p class="muted-small">Última sincronización: ${ucfirst(new Date(state.lastSync).toLocaleString('es-ES'))}</p>`:''}`:
  `<div class="notice">${ico('info')}<div><strong>${ready?'Proyecto configurado':'Estás en modo local'}</strong><br>${ready?'Ahora puedes registrarte o iniciar sesión.':'En este momento tus cambios solo se guardan en este navegador. Configura un proyecto Supabase para activar la nube.'}</div></div>`}
 <div class="detail-subtitle" style="margin-top:24px">1 · Conexión a Supabase</div>
 <div class="form-row"><label for="sb-url">URL del proyecto</label><input id="sb-url" class="field-input" type="url" autocomplete="off" placeholder="https://xxxxx.supabase.co" value="${esc(state.config.url||'')}"></div>
 <div class="form-row"><label for="sb-key">Clave pública (anon / publishable)</label><input id="sb-key" class="field-input" autocomplete="off" spellcheck="false" placeholder="eyJ… o sb_publishable_…" value="${esc(state.config.key||'')}"></div>
 <div class="button-row"><button class="btn-outline" data-action="save-config">${ico('save','sm')} Guardar conexión</button></div>
 <p class="form-hint">Usa exclusivamente una clave pública. Nunca pegues <code>service_role</code> ni una <code>secret</code>. La base de datos debe tener seguridad RLS activada.</p>
-${!user?`<div class="detail-subtitle" style="margin-top:29px">2 · Tu cuenta personal</div><div class="form-row"><label for="auth-email">Correo electrónico</label><input class="field-input" type="email" id="auth-email" autocomplete="email" placeholder="tu@email.com"></div><div class="form-row"><label for="auth-password">Contraseña</label><input class="field-input" type="password" id="auth-password" minlength="8" autocomplete="current-password" placeholder="Mínimo 8 caracteres"></div><div class="button-row"><button data-action="login" class="btn-primary" ${!ready?'disabled':''}>${ico('login','sm')} Iniciar sesión</button><button data-action="signup" class="btn-outline" ${!ready?'disabled':''}>Crear cuenta</button></div><p class="muted-small" style="margin-top:10px">Si es tu primera vez, crea una cuenta. Supabase puede pedirte confirmar el correo antes de iniciar sesión.</p>`:''}
+${!user?`<div class="detail-subtitle" style="margin-top:29px">2 · Tu cuenta personal</div><div class="form-row"><label for="auth-email">Correo electrónico</label><input class="field-input" type="email" id="auth-email" autocomplete="email" placeholder="tu@email.com"></div><div class="form-row"><label for="auth-password">Contraseña</label><input class="field-input" type="password" id="auth-password" minlength="8" autocomplete="current-password" placeholder="Mínimo 8 caracteres"></div><label class="auth-remember-inline" for="auth-remember"><input id="auth-remember" type="checkbox" checked><span>Mantener mi sesión iniciada en este dispositivo</span></label><div class="button-row"><button data-action="login" class="btn-primary" ${!ready?'disabled':''}>${ico('login','sm')} Iniciar sesión</button><button data-action="signup" class="btn-outline" ${!ready?'disabled':''}>Crear cuenta</button></div><p class="muted-small" style="margin-top:10px">Si es tu primera vez, crea una cuenta. Supabase puede pedirte confirmar el correo antes de iniciar sesión.</p>`:''}
 </section><div class="stack"><section class="surface settings-section"><h3>Activación en 4 pasos</h3><p>Prepara Supabase una sola vez; la web ya está publicada en Vercel.</p><ol class="sync-instructions"><li>Entra en <a target="_blank" rel="noopener noreferrer" href="https://supabase.com/dashboard">Supabase</a> y crea un proyecto llamado <b>aurrera-running</b>.</li><li>En SQL Editor, ejecuta <a target="_blank" rel="noopener noreferrer" href="https://github.com/begogarcinuno/aurrera-running/blob/main/supabase_setup.sql">nuestro SQL de configuración</a>. Activa una tabla con RLS que solo permite leer los datos del titular.</li><li>Desde <b>Connect</b> o <b>Settings → API Keys</b>, copia la URL HTTPS del proyecto y la clave pública <code>sb_publishable_…</code> en los dos campos de la izquierda; pulsa <b>Guardar conexión</b>. No uses la clave secreta.</li><li>En Supabase, dentro de <b>Authentication → URL Configuration</b>, configura Site URL <code>https://aurrera-running.vercel.app/</code>. Después crea una cuenta en Aurrera, confirma el correo si se solicita e inicia sesión con <b>la misma cuenta</b> en móvil y ordenador.</li></ol><div class="button-row"><button class="btn-outline" data-action="share-link">${ico('external','sm')} Copiar enlace de esta web</button></div><div class="notice" style="margin-top:18px">${ico('info')}<div>Si rellenas la URL y clave pública solo aquí, tendrás que configurarlas en el otro dispositivo. También podemos incorporar estos dos datos públicos a la web una sola vez, después de crear Supabase. No compartas contraseñas, claves secretas ni tokens de sesión.</div></div></section>
 <section class="surface settings-section"><h3>Copias de seguridad</h3><p>Exporta o importa tus registros. Útil incluso si todavía no tienes la nube preparada.</p><div class="button-row"><button class="btn-outline" data-action="export">${ico('download','sm')} Exportar diario</button><button class="btn-outline" data-action="import">${ico('upload','sm')} Importar diario</button><input id="import-file" type="file" accept="application/json,.json" style="display:none"></div></section>
 <section class="surface settings-section"><h3>Cómo usar el plan con cabeza</h3><p>Diseñado de forma orientativa tomando como referencia poder correr aproximadamente 7 km, pero sin conocer tu volumen actual, lesiones o pulsaciones.</p><div class="steps"><div class="step"><span class="step-no">01</span><span>Si hoy 7 km no te resultan cómodos, recorta las tiradas largas y usa tramos de correr/andar.</span></div><div class="step"><span class="step-no">02</span><span>Los rodajes suaves deben permitirte conversar. El RPE manda más que el ritmo del reloj.</span></div><div class="step"><span class="step-no">03</span><span>Si aparece dolor que altera la zancada, para y busca valoración profesional si persiste.</span></div></div></section></div></div>`;}
