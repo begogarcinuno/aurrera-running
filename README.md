@@ -4,18 +4,14 @@ Aplicación web de entrenamiento de running, con calendario visual, seguimiento 
 
 La web se publica con **GitHub Pages**. No necesitas servidor web, instalar Node.js ni compilar nada: `index.html` contiene toda la aplicación.
 
-![Calendario en ordenador](assets/calendario-ordenador.png)
-
 ## 1. Crear el repositorio GitHub
 
 1. Entra con tu cuenta en https://github.com/new .
 2. **Repository name:** `aurrera-running` (puedes cambiarlo si lo prefieres).
-3. **Visibility:** `Public` si utilizas GitHub Free y quieres usar Pages.
+3. **Visibility:** cambia a `Public` para habilitar Pages con GitHub Free.
 4. No marques **Add a README** ni agregues una licencia en este paso; los archivos ya vienen incluidos.
 5. Haz clic en **Create repository**.
-6. En la pantalla del repositorio vacío, utiliza el enlace **uploading an existing file**. Alternativamente, busca **Add file > Upload files**.
-7. Descomprime el ZIP descargado y arrastra **los archivos y la carpeta `assets`**, no el ZIP cerrado, al área de subida.
-8. Haz clic en **Commit changes**. Deben aparecer `index.html`, `sw.js`, `manifest.webmanifest`, `icon.svg`, los PNG y este `README.md` en la raíz del repositorio.
+6. En el repositorio se han cargado `index.html` y los archivos de configuración. Puedes comprobarlos en la rama principal.
 
 ## 2. Publicar con GitHub Pages
 
@@ -61,7 +57,7 @@ Abre la URL de la web con Safari en tu iPhone y pulsa **Compartir > Añadir a pa
 | --- | --- |
 | `index.html` | Diseño, plan de running y diario interactivo |
 | `manifest.webmanifest` | Datos para instalar la web en el móvil |
-| `icon.svg`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` | Iconografía |
+| `icon.svg` | Iconografía |
 | `sw.js` | Guardado de recursos estáticos para funcionamiento sin conexión |
 | `supabase_setup.sql` | Tabla y políticas de seguridad para sincronización |
 | `.nojekyll` | Publicación estática directa en GitHub Pages |
