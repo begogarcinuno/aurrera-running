@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+*.secret
+*.key
+*.pem
+mi-diario-running-*.json
+.DS_Store
+Thumbs.db
